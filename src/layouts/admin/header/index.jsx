@@ -10,6 +10,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import Tooltip from "@mui/material/Tooltip";
 import Cookies from "js-cookie";
 import {Link} from "react-router-dom";
+import Navbar from "./navbar/navbar";
 
 export default function Header() {
 
@@ -60,49 +61,7 @@ export default function Header() {
     ];
     return (
         <>
-            <header className="h-14 sticky top-0 z-40 bg-white w-full px-6 flex items-center justify-between shadow-md">
-
-                <div className="flex items-center gap-3">
-                    {/* <AppsIcon /> */}
-                    <img className="h-8" src="/images/favicon.ico" alt=""/>
-                    <span className="text-[20px] font-bold text-[#1F1F20]">
-            Quản trị viên
-          </span>
-                </div>
-                <div className="flex items-center gap-6">
-                    <Tooltip title="Thông báo" placement="bottom">
-                        <NotificationsActiveIcon className="text-[#65696E] cursor-pointer hover:text-[#5d6064]"/>
-                    </Tooltip>
-                    <Tooltip title="Trợ giúp" placement="bottom">
-                        <HelpIcon className="text-[#65696E] cursor-pointer hover:text-[#5d6064]"/>
-                    </Tooltip>
-                    {/* <Brightness2Icon className="text-[#65696E]" cursor-pointer hover:text-[#5d6064]/> */}
-                    <Tooltip title="Chế độ sáng" placement="bottom">
-                        <LightModeIcon className="text-[#ffd15c] cursor-pointer hover:text-[#f4cc68]"/>
-                    </Tooltip>
-
-                    <Dropdown
-                        menu={{
-                            items,
-                        }}
-                        trigger={["click"]}
-                    >
-                        <a onClick={(e) => e.preventDefault()}>
-                            <Space>
-                                <div className="flex items-center">
-                                    <img
-                                        className="h-8 w-8 rounded-full border"
-                                        src="https://tse1.mm.bing.net/th?id=OIP.0siT9Vkwx8tb_kFTi-KV1wHaHa&pid=Api&P=0&h=180"
-                                        alt="Ảnh đại diện"
-                                    />
-                                    <KeyboardArrowDownIcon
-                                        className="text-[#65696E] cursor-pointer hover:text-[#5d6064]"/>
-                                </div>
-                            </Space>
-                        </a>
-                    </Dropdown>
-                </div>
-            </header>
+         <Navbar/>
         </>
     );
 }

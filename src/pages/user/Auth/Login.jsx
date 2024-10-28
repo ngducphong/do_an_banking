@@ -47,7 +47,7 @@ export default function Login() {
       console.log(error);
       notify("error", error.response.data || "Có lỗi xảy ra khi đăng nhập");
     } finally {
-      setIsLogining(false);
+      // setIsLogining(false);
     }
   };
 

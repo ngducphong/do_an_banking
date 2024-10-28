@@ -15,7 +15,6 @@ export default function PrivateRouter() {
         <>
             <Header/>
             <div className="flex ">
-                <Menu/>
                 {isAdmin() ? <Outlet/> : <Navigate to={"/"}/>}
             </div>
         </>

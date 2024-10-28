@@ -27,11 +27,6 @@ export default function Menu() {
                         <LocalLibraryIcon/>
                         <span className="menu-text">Khóa học</span>
                     </NavLink>
-
-                    {/*<NavLink to="post" className="no-underline">*/}
-                    {/*  <PostAddIcon />*/}
-                    {/*  <span className="menu-text">Bài viết</span>*/}
-                    {/*</NavLink>*/}
                 </div>
             </menu>
         </>
