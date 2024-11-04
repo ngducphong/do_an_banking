@@ -132,4 +132,35 @@ label {
 
 .active {
   color: #bc2228 !important;
+}.custom-pagination .ant-pagination-item {
+  background-color: #f0f0f0; /* Light gray background */
+  border: none; /* Remove border */
+  border-radius: 6px; /* Rounded corners */
+  color: #666666; /* Gray text color */
+  font-size: 16px; /* Adjust font size */
+}
+
+.custom-pagination .ant-pagination-item-active {
+  background-color: #d4b0f8; /* Light purple background for active page */
+  color: white; /* White text color for active page */
+  font-weight: bold;
+  border: none;
+}
+
+.custom-pagination .ant-pagination-item:hover {
+  background-color: #e5e5e5; /* Slightly darker gray on hover */
+}
+
+.custom-pagination .ant-pagination-item-ellipsis {
+  color: #666666; /* Gray color for ellipsis */
+}
+
+.custom-pagination .ant-pagination-prev,
+.custom-pagination .ant-pagination-next {
+  color: #666666; /* Gray color for arrows */
+}
+
+.custom-pagination .ant-pagination-prev:hover,
+.custom-pagination .ant-pagination-next:hover {
+  color: #d4b0f8; /* Purple color on hover */
 }
