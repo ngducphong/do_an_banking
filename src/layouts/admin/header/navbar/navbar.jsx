@@ -39,7 +39,7 @@ const Navbar = () => {
         {/* Navigation links */}
         <div className="flex items-center gap-8">
           <NavLink
-            to="/employees"
+            to="/admin/staff"
             className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
           >
             Nhân viên

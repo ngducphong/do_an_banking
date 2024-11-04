@@ -15,17 +15,14 @@ import AllCourses from "../pages/user/AllCourses/AllCourses";
 import NotFound from "../pages/notfound/NotFound";
 import PayMentCourse from "../pages/user/PayMent/PayMentCourse.jsx";
 import ChangePassword from "../components/User/ChangePassword.jsx";
+import ListStaff from "../pages/admin/staff/list-staff.jsx";
 const routesConfig = [
   {
     path: "/admin",
     element: <PrivateRouter />,
     children: [
       { path: "", element: <HomeAdmin /> },
-      { path: "management", element: <CourseIndex /> },
-      { path: "category", element: <CategoryManagement /> },
-      { path: "post", element: <PostManagement /> },
-      { path: "user", element: <UserMangagement /> },
-      { path: "course/:id", element: <DetailCourse /> },
+      { path: "staff", element: <ListStaff /> },
       { path: "change-password", element: <ChangePassword /> },
     ],
   },

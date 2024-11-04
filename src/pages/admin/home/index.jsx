@@ -14,23 +14,26 @@ export default function HomeAdmin() {
   }, []);
 
   return (
-    <Grid container spacing={3} style={{ padding: "20px" }}>
+    <Grid container spacing={3} className="pt-20">
       {/* Left Side */}
       <Grid item xs={12} md={6}>
         <Box
           sx={{
-            padding: "20px",
             height: "100%",
             textAlign: "left",
+            ml: "10%",
           }}
           className="grip grid-cols-1 gap-1"
         >
+          <Box className="h-1/3"> </Box>
           <Box className="h-1/3">
-           
-           </Box>
-          <Box className="h-1/3">
-            <Typography className="text-[#9D4EDD] font-semibold" sx={{
-                fontSize:"36px"            }}>
+            <Typography
+              className="text-[#9D4EDD]"
+              sx={{
+                fontSize: "36px",
+                fontWeight: "600",
+              }}
+            >
               Vay nhanh chóng <br /> Trả an tâm
             </Typography>
             <Typography variant="body1" color="textSecondary" mt={2}>
@@ -47,74 +50,42 @@ export default function HomeAdmin() {
               }}
             >
               Xem sản phẩm vay ngay!
-            </Button>
+            </Button>{" "}
           </Box>
-          <Box className="h-1/3">
-           
-           </Box>
-        </Box>
-
-        {/* Feature Buttons */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "16px",
-            mt: 4,
-          }}
-        >
-          <Button
-            variant="outlined"
-            sx={{
-              color: "#9D4EDD",
-              borderColor: "#9D4EDD",
-              minWidth: "150px",
-            }}
-          >
-            📞 Gọi điện tư vấn <br />
-            Tư vấn sản phẩm vay
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{
-              color: "#9D4EDD",
-              borderColor: "#9D4EDD",
-              minWidth: "150px",
-            }}
-          >
-            🏦 Vay uy tín <br />
-            Quy trình phê duyệt nhanh
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{
-              color: "#9D4EDD",
-              borderColor: "#9D4EDD",
-              minWidth: "150px",
-            }}
-          >
-            📉 Lãi suất thấp <br />
-            Lãi suất đảm bảo chi trả
-          </Button>
+          <Box className="h-1/3 flex items-end">
+            <Box className="flex items-end gap-6 justify-center rounded-full bg-slate-300 w-full h-1/2">
+              <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
+                <span className="h-full w-full items-end flex text-[30px]">📞 Gọi điện tư vấn</span>
+                <span className="h-full w-full">Tư vấn sản phẩm vay</span>
+              </Box>
+              <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
+                <span className="h-full w-full items-end flex text-[30px]">🏦 Vay uy tín</span>
+                <span className="h-full w-full"> Quy trình phê duyệt nhanh</span>
+              </Box>
+              <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
+                <span className="h-full w-full items-end flex text-[30px]"> 📉 Lãi suất thấp</span>
+                <span className="h-full w-full"> Lãi suất đảm bảo chi trả</span>
+              </Box>
+            </Box>
+          </Box>
         </Box>
       </Grid>
 
       {/* Right Side - Image and Info */}
-      <Grid item xs={12} md={6} style={{ textAlign: "center" }}>
+      <Grid item xs={12} md={6} className="text-center">
         <Box
           component="img"
           src="/assets/img/icon/homeimg.jpg" // Corrected image path
           alt="Credit Card Banner"
           sx={{
             maxWidth: "100%",
-            borderRadius: "8px",
             boxShadow: 3,
           }}
         />
       </Grid>
 
-      {/* LoanPopup */}
-      <LoanPopup isVisible={isLoanPopupVisible} onClose={closeLoanPopup} />
+       LoanPopup
+       <LoanPopup isVisible={isLoanPopupVisible} onClose={closeLoanPopup} />
     </Grid>
   );
 }
