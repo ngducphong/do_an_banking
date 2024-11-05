@@ -1,5 +1,6 @@
 import {notify} from "../utils/notification";
 import {jsonAxios} from "./api.base.url";
+import Cookies from "js-cookie";
 
 export const getPhone = async (user) => {
     const infoUser = {
@@ -36,6 +37,7 @@ export const loginApi = async (user) => {
         password: user.password,
     };
     try {
+        Cookies.remove("accessToken");
         const response = await jsonAxios.post("/auth/login", infoUser);
         notify("success", "Đăng nhập thành công");
         return response;
