@@ -8,14 +8,5 @@ export default ({ mode }) => {
     plugins: [react()],
     server: {
       port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 4200
-    },
-    css: {
-      postcss: {
-        plugins: [
-          require('autoprefixer'), // Example: add Autoprefixer
-          // Add other PostCSS plugins if needed
-        ],
-      },
-    },
-  });
+    }});
 };
