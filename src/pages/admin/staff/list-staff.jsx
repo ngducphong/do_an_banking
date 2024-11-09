@@ -6,11 +6,13 @@ import {
   EyeOutlined,
   EditOutlined,
 } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const ListStaff = () => {
   const [data, setData] = useState([]); // Replace with your data
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults] = useState(256); // Example total results
+  const navigate = useNavigate();
 
   // Columns definition
   const columns = [
@@ -99,7 +101,11 @@ const ListStaff = () => {
     role: "Nhân viên",
     createdDate: "2024-01-01",
   }));
-
+  const createStaff = (path) => {
+    console.log(path);
+    navigate(`/admin/staff${path}`);
+  };
+  
   // Pagination handler
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -108,7 +114,7 @@ const ListStaff = () => {
   return (
     <div className="p-[20px] w-full h-full ">
       <Space style={{ marginBottom: 16 }}>
-        <Button type="primary" icon={<PlusOutlined />}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={()=>createStaff('/create') }>
           Thêm tài khoản
         </Button>
         <Button icon={<FilterOutlined />}>Lọc tài khoản</Button>

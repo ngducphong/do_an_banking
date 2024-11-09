@@ -14,8 +14,8 @@ export default function PrivateRouter() {
     return (
         <>
             <Header/>
-            <div className="flex ">
-                {isAdmin() ? <Outlet/> : <Navigate to={"/"}/>}
+            <div className="flex h-full w-full">
+                {isAdmin() ? <Outlet/> : <Navigate to={"/admin"}/>}
             </div>
         </>
     );

@@ -16,6 +16,7 @@ import NotFound from "../pages/notfound/NotFound";
 import PayMentCourse from "../pages/user/PayMent/PayMentCourse.jsx";
 import ChangePassword from "../components/User/ChangePassword.jsx";
 import ListStaff from "../pages/admin/staff/list-staff.jsx";
+import RegisterForm from "../pages/admin/staff/register-form.jsx";
 const routesConfig = [
   {
     path: "/admin",
@@ -23,6 +24,7 @@ const routesConfig = [
     children: [
       { path: "", element: <HomeAdmin /> },
       { path: "staff", element: <ListStaff /> },
+      { path: "staff/create", element: <RegisterForm/> },
       { path: "change-password", element: <ChangePassword /> },
     ],
   },
