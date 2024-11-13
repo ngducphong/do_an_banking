@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Input, Table, Space, Pagination } from "antd";
 import {
   PlusOutlined,
@@ -7,14 +7,14 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { paging } from "../../../api/userAPIs";
 
 const ListStaff = () => {
-  const [data, setData] = useState([]); // Replace with your data
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalResults] = useState(256); // Example total results
+  const [data, setData] = useState([]); // Initial data from API
+  const [currentPage, setCurrentPage] = useState(1); // First page by default
+  const [totalResults, setTotalResults] = useState(0); // Total number of records
   const navigate = useNavigate();
 
-  // Columns definition
   const columns = [
     {
       title: "ID",
@@ -26,8 +26,8 @@ const ListStaff = () => {
     },
     {
       title: "Họ và tên",
-      dataIndex: "fullName",
-      key: "fullName",
+      dataIndex: "fullname",
+      key: "fullname",
       onHeaderCell: () => ({
         style: { backgroundColor: "#CED0F8" },
       }),
@@ -90,31 +90,40 @@ const ListStaff = () => {
     },
   ];
 
-  // Dummy data (for testing)
-  const dummyData = Array.from({ length: 10 }, (_, i) => ({
-    key: i,
-    id: i + 1,
-    fullName: "Nguyễn Văn A",
-    username: `user${i + 1}`,
-    phone: "0123456789",
-    dob: "1990-01-01",
-    role: "Nhân viên",
-    createdDate: "2024-01-01",
-  }));
+  useEffect(() => {
+    const fetchData = async () => {
+      const searchRequest = {
+        pageIndex: currentPage, // Adjust for 0-indexed API
+        pageSize: 10,
+      };
+      const response = await paging(searchRequest);
+      if (response) {
+        console.log(response);
+        
+        setData(response?.data?.result?.content || []); // Update table data
+        setTotalResults(response.totalElements || 0); // Update total record count
+      }
+    };
+
+    fetchData();
+  }, [currentPage]); // Dependency ensures re-fetching when page changes
+
+  const onPageChange = (page) => {
+    setCurrentPage(page); // Update state, triggers re-fetch
+  };
+
   const createStaff = (path) => {
-    console.log(path);
     navigate(`/admin/staff${path}`);
   };
-  
-  // Pagination handler
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-    // You would typically fetch new data based on page here
-  };
+
   return (
-    <div className="p-[20px] w-full h-full ">
+    <div className="p-[20px] w-full h-full">
       <Space style={{ marginBottom: 16 }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={()=>createStaff('/create') }>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => createStaff("/create")}
+        >
           Thêm tài khoản
         </Button>
         <Button icon={<FilterOutlined />}>Lọc tài khoản</Button>
@@ -129,10 +138,9 @@ const ListStaff = () => {
       <Table
         className="shadow-2xl"
         columns={columns}
-        dataSource={dummyData} // Replace with `data` when using actual data
+        dataSource={data} // Use fetched data here
         pagination={false}
         bordered
-        header
       />
       <Pagination
         className="custom-pagination text-center mt-[16px] justify-center text-2xl"

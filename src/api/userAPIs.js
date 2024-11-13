@@ -38,7 +38,7 @@ export const loginApi = async (user) => {
     };
     try {
         Cookies.remove("accessToken");
-        const response = await jsonAxios.post("/auth/login", infoUser);
+        const response = await jsonAxios.post("/auth/token", infoUser);
         notify("success", "Đăng nhập thành công");
         return response;
     } catch (error) {
@@ -46,7 +46,15 @@ export const loginApi = async (user) => {
         notify("error", "Sai tài khoản hoặc mật khẩu");
     }
 };
-
+export const paging = async(searchRequest)=>{
+    try {
+        const response = await jsonAxios.post("/users/paging", searchRequest);
+        return response;
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
 export const getAllUsers = async (searchQuery) => {
     try {
         if (searchQuery) {

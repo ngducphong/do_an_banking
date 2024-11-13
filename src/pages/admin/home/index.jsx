@@ -83,8 +83,6 @@ export default function HomeAdmin() {
           }}
         />
       </Grid>
-
-       LoanPopup
        <LoanPopup isVisible={isLoanPopupVisible} onClose={closeLoanPopup} />
     </Grid>
   );

@@ -23,7 +23,7 @@ export default function Login() {
     setIsLogining(true);
     try {
       const response = await loginApi({ username, password });
-      const { accessToken, expired, roles, fullName } = response?.data;
+      const { accessToken, expired, roles, fullName } = response?.data?.result;
       localStorage.setItem("user", fullName);
       localStorage.setItem("roles", JSON.stringify(roles));
       // Lưu accessToken vào cookies
@@ -32,7 +32,7 @@ export default function Login() {
         secure: true,
       });
       const check = roles.some(
-        (item) => item === 'ROLE_ADMIN'
+        (item) => item === 'ADMIN'
       );
       console.log("check : ");
       notify("success", "Đăng nhập thành công");
