@@ -1,137 +1,145 @@
-import { Button, Input, Select, DatePicker, Form } from "antd";
-import Pagination from "@mui/material/Pagination";
-import React, { useEffect, useState } from "react";
-import { Table } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { getUsersThunk } from "../../../redux/reducer/userSlice";
-import FormUser from "../../../components/form/FormUser";
-import { createUser, editUserApi } from "../../../api/userAPIs";
-import { CircularProgress, Grid } from "@mui/material";
-import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from 'react';
+import { Checkbox, Button, Card } from 'antd';
+import {addPermissionsToRole, getPermissionsByRoleName} from "../../../api/permissionsAPIs.js";
+const roles = [
+    { title: "Chuyên viên tín dụng", key: "RECORDSTAFF" },
+    { title: "NV thẩm định", key: "CREDIT_OFFICER" },
+    { title: "CV phê duyệt", key: "APPRAISAL_OFFICER" },
+    { title: "NV giải ngân", key: "AUTHORIZATION_MANAGER" },
+    { title: "NV hồ sơ", key: "FILE_OFFICER" }
+];
 
-// Additional Components for Permissions UI
-const PermissionSection = ({ title, categories }) => (
-    <div className="permission-section">
-        <h3>{title}</h3>
-        {categories.map((category, index) => (
-            <Category key={index} name={category.name} options={category.options} />
-        ))}
-    </div>
-);
-
-const Category = ({ name, options }) => {
-    const [selectedOption, setSelectedOption] = useState("");
-
-    const handleChange = (e) => {
-        setSelectedOption(e.target.value);
-    };
-
-    return (
-        <div className="category">
-            <label>{name}</label>
-            <div className="radio-group">
-                {options.map((option, index) => (
-                    <label key={index}>
-                        <input
-                            type="radio"
-                            value={option}
-                            checked={selectedOption === option}
-                            onChange={handleChange}
-                        />
-                        {option}
-                    </label>
-                ))}
-            </div>
-        </div>
-    );
+// Updated permissionsBySection with objects containing label and value for each checkbox option
+const permissionsBySection = {
+    HoSo: [
+        { value: "RECEIVED", label: "Nhận" },
+        { value: "REQUEST_CHECK", label: "Yêu cầu kiểm tra" },
+        { value: "WAITING_FOR_CHECK", label: "Kiểm tra" },
+        { value: "CHECKING", label: "Hoàn tất KT" },
+        { value: "CHECK_COMPLETED", label: "Từ chối" }
+    ],
+    CIC: [
+        { value: "REJECTED_CHECK", label: "Check CIC" },
+        { value: "WAITING_FOR_CIC_CHECK", label: "Check thành công" },
+        { value: "CHECKING_CIC", label: "Từ chối" }
+    ],
+    ThamDinhDT: [
+        { value: "CIC_CHECK_SUCCESS", label: "Yêu cầu thẩm định" },
+        { value: "WAITING_FOR_EVALUATION", label: "Thẩm định" },
+        { value: "REQUEST_EVALUATION", label: "Từ chối" }
+    ],
+    ThamDinhDB: [
+        { value: "EVALUATING", label: "Yêu cầu thẩm định" },
+        { value: "WAITING_FOR_FINAL_EVALUATION", label: "Thẩm định" },
+        { value: "FINAL_EVALUATION", label: "Từ chối" }
+    ],
+    PheDuyet: [
+        { value: "WAITING_FOR_APPROVAL", label: "Yêu cầu phê duyệt" },
+        { value: "REQUEST_APPROVAL", label: "Phê duyệt" },
+        { value: "APPROVING", label: "Từ chối" }
+    ],
+    GiaiNgan: [
+        { value: "WAITING_FOR_DISBURSEMENT", label: "Đợi giải ngân" },
+        { value: "DISBURSED", label: "Đã giải ngân" }
+    ]
 };
 
-export default function UserManagement() {
-    const allUsers = useSelector((state) => state.userSlice.users);
-    const isLoadingThunk = useSelector((state) => state.userSlice.loading);
-    const dispatch = useDispatch();
-    const [showForm, setShowForm] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [editUser, setEditUser] = useState(null);
-    const [flag, setFlag] = useState(false);
-    const [removeFilter, setRemoveFilter] = useState(false);
-    const [searchTerms, setSearchTerms] = useState({
-        username: "",
-        fullName: "",
-        phone: "",
-        email: "",
-        createDate: null,
-        role: "",
-        voided: ""
-    });
-    const [isLoading, setIsLoading] = useState(false);
-
-    const itemsPerPage = 5;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentUsers = allUsers.slice(indexOfFirstItem, indexOfLastItem);
-
-    const openForm = () => setShowForm(true);
-    const closeForm = () => {
-        setShowForm(false);
-        setEditUser(null);
-    };
-
-    const handlePageChange = (event, value) => setCurrentPage(value);
-
-    const roles = [
-        { value: "0", label: "Quản trị viên" },
-        { value: "1", label: "Hệ thống" },
-        { value: "2", label: "Học viên" }
-    ];
-
-    const statuses = [
-        { value: true, label: "Bị Khóa" },
-        { value: false, label: "Đang hoạt động" }
-    ];
+export default function PermissionForm() {
+    const [selectedPermissions, setSelectedPermissions] = useState(
+        roles.reduce((acc, role) => {
+            acc[role.key] = {
+                HoSo: [],
+                CIC: [],
+                ThamDinhDT: [],
+                ThamDinhDB: [],
+                PheDuyet: [],
+                GiaiNgan: []
+            };
+            return acc;
+        }, {})
+    );
 
     useEffect(() => {
-        dispatch(getUsersThunk());
-    }, [flag, dispatch]);
+        // Hàm cập nhật selectedPermissions dựa trên dữ liệu trả về từ API
+        const fetchPermissions = async () => {
+            const updatedPermissions = { ...selectedPermissions };
 
-    const handleSave = async (userData) => {
-        if (userData.type === "add") {
-            await createUser(userData);
-            setFlag(!flag);
-            closeForm();
-        } else {
-            await editUserApi(userData);
-            setFlag(!flag);
-            closeForm();
+            // Sử dụng Promise.all để gọi API cho tất cả các roles cùng lúc
+            await Promise.all(roles.map(async (role) => {
+                const data = await getPermissionsByRoleName(role.key);
+
+                // Nếu data tồn tại, phân loại quyền theo các section
+                if (data) {
+                    Object.keys(permissionsBySection).forEach(sectionKey => {
+                        const sectionPermissions = permissionsBySection[sectionKey].map(p => p.value);
+                        updatedPermissions[role.key][sectionKey] = data
+                            .filter(permission => sectionPermissions.includes(permission.code))
+                            .map(permission => permission.code);
+                    });
+                }
+            }));
+            setSelectedPermissions(updatedPermissions);
+        };
+
+        fetchPermissions();
+    }, []);
+
+    const handleCheckboxChange = (roleKey, sectionKey, checkedValues) => {
+        setSelectedPermissions((prevPermissions) => ({
+            ...prevPermissions,
+            [roleKey]: {
+                ...prevPermissions[roleKey],
+                [sectionKey]: checkedValues
+            }
+        }));
+    };
+
+    // const handleSubmit = () => {
+    //     console.log('Selected Permissions:', selectedPermissions);
+    //     // Submit logic here
+    // };
+
+    const handleSubmit = async () => {
+        try {
+            await Promise.all(
+                roles.map(async (role) => {
+                    // Tạo danh sách `apiCodes` từ các quyền đã chọn trong `selectedPermissions`
+                    const apiCodes = Object.values(selectedPermissions[role.key]).flat();
+                    if (apiCodes.length > 0) {
+                        // Gọi API để thêm quyền cho từng vai trò
+                        const response = await addPermissionsToRole(role.key, apiCodes);
+                        if (response) {
+                            console.log(`Quyền đã được thêm cho vai trò ${role.title}:`, response);
+                        }
+                    }
+                })
+            );
+            console.log("Quyền đã được cập nhật cho tất cả vai trò.");
+        } catch (error) {
+            console.error("Lỗi khi cập nhật quyền:", error);
         }
     };
 
-
-
-    // Permission Data (Example Structure)
-    const permissionCategories = [
-        { name: "Hồ sơ", options: ["Nhận", "YC kiểm tra", "Kiểm tra", "Hoàn tất KT", "Từ chối"] },
-        { name: "CIC", options: ["Check CIC", "Check thành công", "Từ chối"] },
-        { name: "Thẩm định DT", options: ["YC thẩm định", "Thẩm định", "Từ chối"] },
-        { name: "Phê duyệt", options: ["YC phê duyệt", "Phê duyệt", "Từ chối"] },
-        { name: "Giải ngân", options: ["Đã giải ngân"] }
-    ];
-
     return (
-        <>
-            <div className="px-6 py-3 flex flex-col w-full">
-                <h1>Phân quyền</h1>
-                <PermissionSection title="NV hồ sơ" categories={permissionCategories} />
-                <PermissionSection title="CV tín dụng" categories={permissionCategories} />
-
-                {/* User Management UI */}
-                <div className="flex flex-col gap-4 w-full">
-                    <Button type="primary" className="bg-blue-600" onClick={openForm}>
-                        Thêm người dùng
-                    </Button>
-
-                </div>
-            </div>
-        </>
+        <div>
+            <h2>Phân quyền</h2>
+            {roles.map((role) => (
+                <Card key={role.key} title={role.title} style={{ marginBottom: 16 }}>
+                    {Object.keys(permissionsBySection).map((sectionKey) => (
+                        <div key={sectionKey} style={{ marginBottom: 12 }}>
+                            <label>{sectionKey}</label>
+                            <Checkbox.Group
+                                options={permissionsBySection[sectionKey]}
+                                value={selectedPermissions[role.key][sectionKey]}
+                                onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}
+                            />
+                        </div>
+                    ))}
+                </Card>
+            ))}
+            <Button type="primary" onClick={handleSubmit}>
+                Cập nhật
+            </Button>
+        </div>
     );
 }

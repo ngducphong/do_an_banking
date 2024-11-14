@@ -9,7 +9,7 @@ import DetailCourse from "../pages/admin/detailCourse";
 import HomeAdmin from "../pages/admin/home";
 import CategoryManagement from "../pages/admin/category_management/CategoryManagement";
 import PostManagement from "../pages/admin/posts/PostManagement";
-import UserMangagement from "../pages/admin/user_management";
+import PermissionsForm from "../pages/admin/user_management";
 import LearningCourse from "../pages/user/LearningCourse/LearningCourse";
 import AllCourses from "../pages/user/AllCourses/AllCourses";
 import NotFound from "../pages/notfound/NotFound";
@@ -26,7 +26,7 @@ const routesConfig = [
       { path: "staff", element: <ListStaff /> },
       { path: "staff/create", element: <RegisterForm/> },
       { path: "change-password", element: <ChangePassword /> },
-      { path: "permissions", element: <UserMangagement /> },
+      { path: "permissions", element: <PermissionsForm /> },
     ],
   },
   // {
