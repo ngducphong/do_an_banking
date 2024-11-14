@@ -1,367 +1,145 @@
-import { Button, Input, Select, DatePicker, Form } from "antd";
-import Pagination from "@mui/material/Pagination";
-import React, { useEffect, useState } from "react";
-import { Table } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { getUsersThunk } from "../../../redux/reducer/userSlice";
-import FormUser from "../../../components/form/FormUser";
-import { createUser, editUserApi } from "../../../api/userAPIs";
-import { CircularProgress, Grid } from "@mui/material";
-import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from 'react';
+import { Checkbox, Button, Card } from 'antd';
+import {addPermissionsToRole, getPermissionsByRoleName} from "../../../api/permissionsAPIs.js";
+const roles = [
+    { title: "Chuyên viên tín dụng", key: "RECORDSTAFF" },
+    { title: "NV thẩm định", key: "CREDIT_OFFICER" },
+    { title: "CV phê duyệt", key: "APPRAISAL_OFFICER" },
+    { title: "NV giải ngân", key: "AUTHORIZATION_MANAGER" },
+    { title: "NV hồ sơ", key: "FILE_OFFICER" }
+];
 
-export default function UserManagement() {
-    const allUsers = useSelector((state) => state.userSlice.users);
-    const isLoadingThunk = useSelector((state) => state.userSlice.loading);
-    const dispatch = useDispatch();
-    const [showForm, setShowForm] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [editUser, setEditUser] = useState(null);
-    const [flag, setFlag] = useState(false);
-    const [removeFilter, setRemoveFilter] = useState(false);
-    const [searchTerms, setSearchTerms] = useState({
-        username: "",
-        fullName: "",
-        phone: "",
-        email: "",
-        createDate: null,
-        role: "",
-        voided: ""
-    });
-    const [isLoading, setIsLoading] = useState(false);
+// Updated permissionsBySection with objects containing label and value for each checkbox option
+const permissionsBySection = {
+    HoSo: [
+        { value: "RECEIVED", label: "Nhận" },
+        { value: "REQUEST_CHECK", label: "Yêu cầu kiểm tra" },
+        { value: "WAITING_FOR_CHECK", label: "Kiểm tra" },
+        { value: "CHECKING", label: "Hoàn tất KT" },
+        { value: "CHECK_COMPLETED", label: "Từ chối" }
+    ],
+    CIC: [
+        { value: "REJECTED_CHECK", label: "Check CIC" },
+        { value: "WAITING_FOR_CIC_CHECK", label: "Check thành công" },
+        { value: "CHECKING_CIC", label: "Từ chối" }
+    ],
+    ThamDinhDT: [
+        { value: "CIC_CHECK_SUCCESS", label: "Yêu cầu thẩm định" },
+        { value: "WAITING_FOR_EVALUATION", label: "Thẩm định" },
+        { value: "REQUEST_EVALUATION", label: "Từ chối" }
+    ],
+    ThamDinhDB: [
+        { value: "EVALUATING", label: "Yêu cầu thẩm định" },
+        { value: "WAITING_FOR_FINAL_EVALUATION", label: "Thẩm định" },
+        { value: "FINAL_EVALUATION", label: "Từ chối" }
+    ],
+    PheDuyet: [
+        { value: "WAITING_FOR_APPROVAL", label: "Yêu cầu phê duyệt" },
+        { value: "REQUEST_APPROVAL", label: "Phê duyệt" },
+        { value: "APPROVING", label: "Từ chối" }
+    ],
+    GiaiNgan: [
+        { value: "WAITING_FOR_DISBURSEMENT", label: "Đợi giải ngân" },
+        { value: "DISBURSED", label: "Đã giải ngân" }
+    ]
+};
 
-    const itemsPerPage = 5;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentUsers = allUsers.slice(indexOfFirstItem, indexOfLastItem);
-    const calculateIndex = (index) => index + 1;
-
-    const openForm = () => {
-        setShowForm(true);
-    };
-
-    const closeForm = () => {
-        setShowForm(false);
-        setEditUser(null);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-    };
-
-    const roles = [
-        { value: "0", label: "Quản trị viên" },
-        { value: "1", label: "Hệ thống" },
-        { value: "2", label: "Học viên" }
-    ];
-
-    const statuses = [
-        { value: true, label: "Bị Khóa" },
-        { value: false, label: "Đang hoạt động" }
-    ];
-
-    const columns = [
-        {
-            title: "STT",
-            dataIndex: "",
-            align: "center",
-            render: (_, __, index) => calculateIndex(index),
-        },
-        {
-            title: "Tên tài khoản",
-            dataIndex: "username",
-            align: "center",
-            render: (text) => <p>{text}</p>,
-        },
-        {
-            title: "Tên người dùng",
-            dataIndex: "fullName",
-            align: "center",
-            render: (text) => <p>{text}</p>,
-        },
-        {
-            title: "Số điện thoại",
-            dataIndex: "phone",
-            align: "center",
-            render: (text) => <p>{text}</p>,
-        },
-        {
-            title: "Email",
-            dataIndex: "email",
-            align: "center",
-            render: (text) => <p>{text}</p>,
-        },
-        {
-            title: "Ngày tạo",
-            dataIndex: "createDate",
-            align: "center",
-            render: (createDate) => {
-                const date = new Date(createDate);
-                const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-                return <p>{formattedDate}</p>;
-            },
-        },
-        {
-            title: "Quyền",
-            dataIndex: "role",
-            align: "center",
-            render: (roles) => (
-                <div>
-                    {roles.map((role, index) => (
-                        <p key={index}>
-                            {role === "ROLE_ADMIN" ? "Quản trị viên" :
-                                role === "ROLE_SUBADMIN" ? "Hệ thống" :
-                                    role === "ROLE_USER" ? "Học viên" : ""}
-                        </p>
-                    ))}
-                </div>
-            ),
-        },
-        {
-            title: "Trạng thái",
-            dataIndex: "voided",
-            align: "center",
-            render: (text) => (
-                <p>
-                    {text ? (
-                        <span className="text-red-500 font-bold">Bị Khóa</span>
-                    ) : (
-                        <span className="text-green-500 font-bold">Đang hoạt động</span>
-                    )}
-                </p>
-            ),
-        },
-        {
-            title: "Chức năng",
-            align: "center",
-            render: (item) => {
-                return (
-                    <div className="flex justify-evenly ">
-                        <Button
-                            onClick={() => {
-                                setEditUser(item);
-                                openForm();
-                            }}
-                        >
-                            Chỉnh sửa
-                        </Button>
-                    </div>
-                );
-            },
-        },
-    ];
+export default function PermissionForm() {
+    const [selectedPermissions, setSelectedPermissions] = useState(
+        roles.reduce((acc, role) => {
+            acc[role.key] = {
+                HoSo: [],
+                CIC: [],
+                ThamDinhDT: [],
+                ThamDinhDB: [],
+                PheDuyet: [],
+                GiaiNgan: []
+            };
+            return acc;
+        }, {})
+    );
 
     useEffect(() => {
-        dispatch(getUsersThunk());
-    }, [flag, dispatch]);
+        // Hàm cập nhật selectedPermissions dựa trên dữ liệu trả về từ API
+        const fetchPermissions = async () => {
+            const updatedPermissions = { ...selectedPermissions };
 
-    useEffect(() => {
-        fetchUsers(searchTerms);
+            // Sử dụng Promise.all để gọi API cho tất cả các roles cùng lúc
+            await Promise.all(roles.map(async (role) => {
+                const data = await getPermissionsByRoleName(role.key);
+
+                // Nếu data tồn tại, phân loại quyền theo các section
+                if (data) {
+                    Object.keys(permissionsBySection).forEach(sectionKey => {
+                        const sectionPermissions = permissionsBySection[sectionKey].map(p => p.value);
+                        updatedPermissions[role.key][sectionKey] = data
+                            .filter(permission => sectionPermissions.includes(permission.code))
+                            .map(permission => permission.code);
+                    });
+                }
+            }));
+            setSelectedPermissions(updatedPermissions);
+        };
+
+        fetchPermissions();
     }, []);
 
-    const handleSave = async (userData) => {
-        if (userData.type === "add") {
-            await createUser(userData);
-            setFlag(!flag);
-            closeForm();
-        } else {
-            await editUserApi(userData);
-            setFlag(!flag);
-            closeForm();
-        }
-        fetchUsers(searchTerms);
-    };
-
-    const handleSearch = () => {
-        setRemoveFilter(true);
-        fetchUsers(searchTerms);
-    };
-
-    const handleRemoveFilter = () => {
-        setRemoveFilter(false);
-        setSearchTerms({
-            username: "",
-            fullName: "",
-            phone: "",
-            email: "",
-            createDate: null,
-            role: "",
-            voided: ""
-        });
-        fetchUsers({
-            username: "",
-            fullName: "",
-            phone: "",
-            email: "",
-            createDate: null,
-            role: "",
-            voided: ""
-        });
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setSearchTerms((prevTerms) => ({
-            ...prevTerms,
-            [name]: value
+    const handleCheckboxChange = (roleKey, sectionKey, checkedValues) => {
+        setSelectedPermissions((prevPermissions) => ({
+            ...prevPermissions,
+            [roleKey]: {
+                ...prevPermissions[roleKey],
+                [sectionKey]: checkedValues
+            }
         }));
     };
 
-    const handleDateChange = (date, dateString) => {
-        setSearchTerms((prevTerms) => ({
-            ...prevTerms,
-            createDate: dateString
-        }));
-    };
+    // const handleSubmit = () => {
+    //     console.log('Selected Permissions:', selectedPermissions);
+    //     // Submit logic here
+    // };
 
-    const handleRoleChange = (value) => {
-        setSearchTerms((prevTerms) => ({
-            ...prevTerms,
-            role: value
-        }));
-    };
-
-    const handleStatusChange = (value) => {
-        setSearchTerms((prevTerms) => ({
-            ...prevTerms,
-            voided: value
-        }));
-    };
-
-    const fetchUsers = (searchTerms) => {
-        setIsLoading(true);
+    const handleSubmit = async () => {
         try {
-            dispatch(getUsersThunk({ searchTerms: searchTerms }));
+            await Promise.all(
+                roles.map(async (role) => {
+                    // Tạo danh sách `apiCodes` từ các quyền đã chọn trong `selectedPermissions`
+                    const apiCodes = Object.values(selectedPermissions[role.key]).flat();
+                    if (apiCodes.length > 0) {
+                        // Gọi API để thêm quyền cho từng vai trò
+                        const response = await addPermissionsToRole(role.key, apiCodes);
+                        if (response) {
+                            console.log(`Quyền đã được thêm cho vai trò ${role.title}:`, response);
+                        }
+                    }
+                })
+            );
+            console.log("Quyền đã được cập nhật cho tất cả vai trò.");
         } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
+            console.error("Lỗi khi cập nhật quyền:", error);
         }
     };
 
     return (
-        <>
-            {showForm && (
-                <FormUser
-                    closeForm={closeForm}
-                    handleOk={handleSave}
-                    editUser={editUser}
-                />
-            )}
-            <div className="px-6 py-3 flex flex-col  w-full">
-                <div className="flex flex-col gap-4 w-full">
-                    <div className="flex items-center justify-between">
-                        <Form
-                            className="fade-down bg-white w-[85%] px-[24px] py-[20px] rounded"
-                            style={{
-                                border: "1px solid #ccc",
-                                padding: "20px",
-                            }}
-                            layout="vertical"
-                        >
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                    <Form.Item label="Tên tài khoản" name="username">
-                                        <Input
-                                            name="username"
-                                            value={searchTerms.username}
-                                            placeholder="Tìm kiếm theo tên tài khoản"
-                                            onChange={handleInputChange}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Tên người dùng" name="fullName">
-                                        <Input
-                                            name="fullName"
-                                            value={searchTerms.fullName}
-                                            placeholder="Tìm kiếm theo tên người dùng"
-                                            onChange={handleInputChange}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Số điện thoại" name="phone">
-                                        <Input
-                                            name="phone"
-                                            value={searchTerms.phone}
-                                            placeholder="Tìm kiếm theo số điện thoại"
-                                            onChange={handleInputChange}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Email" name="email">
-                                        <Input
-                                            name="email"
-                                            value={searchTerms.email}
-                                            placeholder="Tìm kiếm theo email"
-                                            onChange={handleInputChange}
-                                        />
-                                    </Form.Item>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Form.Item label="Ngày tạo" name="createDate">
-                                        <DatePicker
-                                            placeholder="Tìm kiếm theo ngày tạo"
-                                            onChange={handleDateChange}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Quyền" name="role">
-                                        <Select
-                                            placeholder="Tìm kiếm theo quyền"
-                                            value={searchTerms.role}
-                                            options={roles}
-                                            onChange={handleRoleChange}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Trạng thái" name="voided">
-                                        <Select
-                                            placeholder="Tìm kiếm theo trạng thái"
-                                            value={searchTerms.voided}
-                                            options={statuses}
-                                            onChange={handleStatusChange}
-                                        />
-                                    </Form.Item>
-                                </Grid>
-                            </Grid>
-                            <div>
-                                <Button type="primary" onClick={handleSearch}>
-                                    <SearchOutlined /> Tìm kiếm
-                                </Button>
-                                {removeFilter && (
-                                    <Button type="dashed" onClick={handleRemoveFilter} style={{ marginLeft: "20px" }}>
-                                        <CloseOutlined /> Bỏ lọc
-                                    </Button>
-                                )}
-                            </div>
-                        </Form>
-                        <Button type="primary" className="bg-blue-600" onClick={openForm}>
-                            Thêm người dùng
-                        </Button>
-                    </div>
-                    <div className="table-container relative">
-                        <div className="mb-8">
-                            {isLoadingThunk || currentUsers.length === 0 ? (
-                                <Grid
-                                    item
-                                    xs={12}
-                                    style={{ display: "flex", justifyContent: "center" }}
-                                >
-                                    {isLoading ? <CircularProgress /> : <h5>Không có dữ liệu</h5>}
-                                </Grid>
-                            ) : (
-                                <Table
-                                    columns={columns}
-                                    dataSource={currentUsers}
-                                    pagination={false}
-                                />
-                            )}
-                        </div>
-                        <div className="flex justify-center">
-                            <Pagination
-                                count={Math.ceil(allUsers.length / itemsPerPage)}
-                                page={currentPage}
-                                onChange={handlePageChange}
-                                color="primary"
+        <div>
+            <h2>Phân quyền</h2>
+            {roles.map((role) => (
+                <Card key={role.key} title={role.title} style={{ marginBottom: 16 }}>
+                    {Object.keys(permissionsBySection).map((sectionKey) => (
+                        <div key={sectionKey} style={{ marginBottom: 12 }}>
+                            <label>{sectionKey}</label>
+                            <Checkbox.Group
+                                options={permissionsBySection[sectionKey]}
+                                value={selectedPermissions[role.key][sectionKey]}
+                                onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}
                             />
                         </div>
-                    </div>
-                </div>
-            </div>
-        </>
+                    ))}
+                </Card>
+            ))}
+            <Button type="primary" onClick={handleSubmit}>
+                Cập nhật
+            </Button>
+        </div>
     );
 }

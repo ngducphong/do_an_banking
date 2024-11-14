@@ -9,7 +9,7 @@ import DetailCourse from "../pages/admin/detailCourse";
 import HomeAdmin from "../pages/admin/home";
 import CategoryManagement from "../pages/admin/category_management/CategoryManagement";
 import PostManagement from "../pages/admin/posts/PostManagement";
-import UserMangagement from "../pages/admin/user_management";
+import PermissionsForm from "../pages/admin/user_management";
 import LearningCourse from "../pages/user/LearningCourse/LearningCourse";
 import AllCourses from "../pages/user/AllCourses/AllCourses";
 import NotFound from "../pages/notfound/NotFound";
@@ -28,18 +28,19 @@ const routesConfig = [
       { path: "staff/view/:id", element: <RegisterForm/> },
       { path: "staff/edit/:id", element: <RegisterForm/> },
       { path: "change-password", element: <ChangePassword /> },
+      { path: "permissions", element: <PermissionsForm /> },
     ],
   },
-  {
-    path: "/",
-    element: <IndexUser />,
-    children: [
-      { path: "/", element: <Home /> },
-      { path: "/courses", element: <AllCourses /> },
-      { path: "/courseDetail/:id", element: <CourseDetail /> },
-      { path: "/payMentCourse/:id", element: <PayMentCourse /> },
-    ],
-  },
+  // {
+  //   path: "/",
+  //   element: <IndexUser />,
+  //   children: [
+  //     { path: "/", element: <Home /> },
+  //     { path: "/courses", element: <AllCourses /> },
+  //     { path: "/courseDetail/:id", element: <CourseDetail /> },
+  //     { path: "/payMentCourse/:id", element: <PayMentCourse /> },
+  //   ],
+  // },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
   { path: "/course/learn/:id", element: <LearningCourse /> },

@@ -134,9 +134,6 @@ const ListStaff = () => {
   const navigateTo = (path) => {
     navigate(`/admin/staff${path}`);
   };
-  const viewStaf = (id) => {
-    navigate(`/admin/staff/view/${id}`);
-  };
   return (
     <div className="p-[20px] w-full h-full">
       <Space style={{ marginBottom: 16 }}>

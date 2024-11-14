@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className="main-wrapper">
       <div className="error-box">
         <div className="error-logo">
-          <a href="/">
+          <a href="/admin">
             <div className="footer-logo">
               <img
                   src="assets/img/img.png"
@@ -20,7 +20,7 @@ export default function NotFound() {
         </div>
         <h3 className="h2 mb-3">Oh No! Error 404</h3>
         <p className="h4 font-weight-normal">Trang không tồn tại!</p>
-        <a href="/" className="btn btn-primary">
+        <a href="/admin" className="btn btn-primary">
           Quay lại trang chủ
         </a>
       </div>

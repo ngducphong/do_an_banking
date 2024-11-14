@@ -23,25 +23,20 @@ export default function Login() {
     setIsLogining(true);
     try {
       const response = await loginApi({ username, password });
-      const { accessToken, expired, roles, fullName } = response?.data?.result;
+      const { token: accessToken, expiryTime, roles, type, username: fullName } = response?.data?.result;
+
       localStorage.setItem("user", fullName);
       localStorage.setItem("roles", JSON.stringify(roles));
       // Lưu accessToken vào cookies
       Cookies.set("accessToken", accessToken, {
-        expires: expired / (24 * 60 * 60 * 1000),
+        expires: expiryTime / (24 * 60 * 60 * 1000),
         secure: true,
       });
-      const check = roles.some(
-        (item) => item === 'ADMIN'
-      );
+
       console.log("check : ");
       notify("success", "Đăng nhập thành công");
       //  // Xử lý chuyển hướng nếu cần
-      if (check) {
-        window.location.href = "/admin";
-      }else {
-        window.location.href = "/";
-      }
+      window.location.href = "/admin";
 
     } catch (error) {
       console.log(error);
