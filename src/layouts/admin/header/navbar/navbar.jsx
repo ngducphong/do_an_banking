@@ -51,7 +51,7 @@ const Navbar = () => {
             Khách hàng
           </NavLink>
           <NavLink
-            to="/permissions"
+            to="/admin/permissions"
             className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
           >
             Phân quyền

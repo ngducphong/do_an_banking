@@ -113,7 +113,7 @@ const ListStaff = () => {
   };
 
   const createStaff = (path) => {
-    navigate(`/admin/staff${path}`);
+    navigate(`/staff${path}`);
   };
 
   return (
