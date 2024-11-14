@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { paging } from "../../../api/userAPIs";
+import moment from "moment";
 
 const ListStaff = () => {
   const [data, setData] = useState([]); // Initial data from API
@@ -55,6 +56,9 @@ const ListStaff = () => {
       onHeaderCell: () => ({
         style: { backgroundColor: "#CED0F8" },
       }),
+      render: (dob) => (
+        <span>{dob ? moment(dob).format("DD/MM/YYYY") : ""}</span>
+      ),
     },
     {
       title: "Vai trò",
@@ -66,16 +70,25 @@ const ListStaff = () => {
     },
     {
       title: "Ngày tạo",
-      dataIndex: "createdDate",
-      key: "createdDate",
+      dataIndex: "createdAt",
+      key: "createdAt",
       onHeaderCell: () => ({
         style: { backgroundColor: "#CED0F8" },
       }),
+      render: (createdAt) => (
+        <span>{moment(createdAt).format("DD/MM/YYYY")}</span>
+      ),
     },
     {
       title: "Xem chi tiết",
       key: "view",
-      render: () => <Button icon={<EyeOutlined />} type="link" />,
+      render: (row) => (
+        <Button
+          icon={<EyeOutlined />}
+          type="link"
+          onClick={() => navigateTo(`/view/${row?.id}`)}
+        />
+      ),
       onHeaderCell: () => ({
         style: { backgroundColor: "#CED0F8" },
       }),
@@ -83,7 +96,13 @@ const ListStaff = () => {
     {
       title: "Sửa",
       key: "edit",
-      render: () => <Button icon={<EditOutlined />} type="link" />,
+      render: (row) => (
+        <Button
+          icon={<EditOutlined />}
+          type="link"
+          onClick={() => navigateTo(`/edit/${row?.id}`)}
+        />
+      ),
       onHeaderCell: () => ({
         style: { backgroundColor: "#CED0F8" },
       }),
@@ -99,9 +118,9 @@ const ListStaff = () => {
       const response = await paging(searchRequest);
       if (response) {
         console.log(response);
-        
+
         setData(response?.data?.result?.content || []); // Update table data
-        setTotalResults(response.totalElements || 0); // Update total record count
+        setTotalResults(response.data?.result?.totalElements || 0); // Update total record count
       }
     };
 
@@ -112,17 +131,19 @@ const ListStaff = () => {
     setCurrentPage(page); // Update state, triggers re-fetch
   };
 
-  const createStaff = (path) => {
+  const navigateTo = (path) => {
     navigate(`/admin/staff${path}`);
   };
-
+  const viewStaf = (id) => {
+    navigate(`/admin/staff/view/${id}`);
+  };
   return (
     <div className="p-[20px] w-full h-full">
       <Space style={{ marginBottom: 16 }}>
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => createStaff("/create")}
+          onClick={() => navigateTo("/create")}
         >
           Thêm tài khoản
         </Button>

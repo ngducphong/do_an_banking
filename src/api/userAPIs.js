@@ -54,6 +54,14 @@ export const paging = async (searchRequest) => {
         notify("error", "Có lỗi xảy ra");
     }
 }
+export const findUserById = async (id)=>{
+    try {
+        return await jsonAxios.post(`/users/${id}`,);
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
 export const createUser = async (form) => {
     try {
         return await jsonAxios.post("/users/create-user-staff", form);

@@ -25,6 +25,8 @@ const routesConfig = [
       { path: "", element: <HomeAdmin /> },
       { path: "staff", element: <ListStaff /> },
       { path: "staff/create", element: <RegisterForm/> },
+      { path: "staff/view/:id", element: <RegisterForm/> },
+      { path: "staff/edit/:id", element: <RegisterForm/> },
       { path: "change-password", element: <ChangePassword /> },
     ],
   },
