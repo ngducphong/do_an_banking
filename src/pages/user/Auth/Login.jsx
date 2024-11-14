@@ -23,7 +23,6 @@ export default function Login() {
     setIsLogining(true);
     try {
       const response = await loginApi({ username, password });
-      debugger;
       const { token: accessToken, expiryTime, roles, type, username: fullName } = response?.data?.result;
 
       localStorage.setItem("user", fullName);
