@@ -46,21 +46,38 @@ export const loginApi = async (user) => {
         notify("error", "Sai tài khoản hoặc mật khẩu");
     }
 };
-export const paging = async(searchRequest)=>{
+export const paging = async (searchRequest) => {
     try {
-        const response = await jsonAxios.post("/users/paging", searchRequest);
-        return response;
+        return await jsonAxios.post("/users/paging", searchRequest);
     } catch (error) {
         console.log(error);
         notify("error", "Có lỗi xảy ra");
     }
 }
+export const createUser = async (form) => {
+    try {
+        return await jsonAxios.post("/users/create-user-staff", form);
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
+export const createUserName = async (fullname) => {
+    try {
+        const encodedFullname = encodeURIComponent(fullname);
+        return await jsonAxios.get(`/users/generate-username?userName=${encodedFullname}`);
+    } catch (error) {
+        console.error(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+};
+
 export const getAllUsers = async (searchQuery) => {
     try {
         if (searchQuery) {
             const search = searchQuery?.searchTerms;
 
-            console.log( (search))
+            console.log((search))
 
             let url = 'api/v1/user/page?';
             let params = [];
@@ -112,24 +129,6 @@ export const getAllUsers = async (searchQuery) => {
         }
     }
 };
-export const createUser = async (userData) => {
-    try {
-        const res = await jsonAxios.post("api/v1/user/create-user", userData);
-        if (res.data === "Success"){
-            notify("success", "Tạo người dùng thành công");
-        }else {
-            console.log(res.data)
-            notify("error", res.data);
-        }
-
-    } catch (error) {
-        if (error.response.status === 401) {
-            notify("error", "Bạn không có quyền");
-        } else {
-            notify("error", "Có lỗi xảy ra khi tạo người dùng");
-        }
-    }
-};
 export const editUserApi = async (userData) => {
     try {
         await jsonAxios.put(
@@ -168,7 +167,7 @@ export const changePassword = async (changePasswordRequest) => {
 
 export const getUserAccountRegistrationData = async (year) => {
     try {
-        year = year||2024
+        year = year || 2024
         const response = await jsonAxios.get(
             `/api/v1/user/get-user-account-registration-data?year=${year}`
         );
@@ -186,7 +185,7 @@ export const getUserAccountRegistrationData = async (year) => {
 
 export const getPaymentChartData = async (year) => {
     try {
-        year = year||2024
+        year = year || 2024
         const response = await jsonAxios.get(
             `/api/v1/user/get-payment-chart-data?year=${year}`
         );
