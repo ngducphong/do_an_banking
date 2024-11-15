@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Checkbox, Button, Card } from 'antd';
-import {addPermissionsToRole, getPermissionsByRoleName} from "../../../api/permissionsAPIs.js";
+import { Checkbox, Button, Card, Modal } from 'antd';
+import { addPermissionsToRole, getPermissionsByRoleName } from "../../../api/permissionsAPIs.js";
+import { CheckCircleOutlined } from '@ant-design/icons';
 const roles = [
     { title: "Chuyên viên tín dụng", key: "RECORDSTAFF" },
     { title: "NV thẩm định", key: "CREDIT_OFFICER" },
@@ -13,33 +14,33 @@ const roles = [
 const permissionsBySection = {
     "Hồ sơ": [
         { value: "RECEIVED", label: "Nhận" },
-        { value: "REQUEST_CHECK", label: "Yêu cầu kiểm tra" },
-        { value: "WAITING_FOR_CHECK", label: "Kiểm tra" },
-        { value: "CHECKING", label: "Hoàn tất KT" },
-        { value: "CHECK_COMPLETED", label: "Từ chối" }
+        { value: "WAITING_FOR_CHECK", label: "Yêu cầu kiểm tra" },
+        { value: "CHECKING", label: "Kiểm tra" },
+        { value: "WAITING_FOR_CIC_CHECK", label: "Hoàn tất KT" },
+        { value: "REJECTED_CHECK_HS", label: "Từ chối" }
     ],
-    CIC: [
-        { value: "REJECTED_CHECK", label: "Check CIC" },
-        { value: "WAITING_FOR_CIC_CHECK", label: "Check thành công" },
-        { value: "CHECKING_CIC", label: "Từ chối" }
+    "CIC": [
+        { value: "CHECKING_CIC", label: "Check CIC" },
+        { value: "WAITING_FOR_EVALUATION", label: "Check thành công" },
+        { value: "REJECTED_CHECK_CIC", label: "Từ chối" }
     ],
+
     "Thẩm định ĐT": [
-        { value: "CIC_CHECK_SUCCESS", label: "Yêu cầu thẩm định" },
-        { value: "WAITING_FOR_EVALUATION", label: "Thẩm định" },
-        { value: "REQUEST_EVALUATION", label: "Từ chối" }
-    ],
-    "Thẩm định ĐB": [
         { value: "EVALUATING", label: "Yêu cầu thẩm định" },
         { value: "WAITING_FOR_FINAL_EVALUATION", label: "Thẩm định" },
-        { value: "FINAL_EVALUATION", label: "Từ chối" }
+        { value: "REJECTED_CHECK_DT", label: "Từ chối" }
+    ],
+    "Thẩm định ĐB": [
+        { value: "FINAL_EVALUATION", label: "Yêu cầu thẩm định" },
+        { value: "WAITING_FOR_APPROVAL", label: "Thẩm định" },
+        { value: "REJECTED_CHECK_DB", label: "Từ chối" }
     ],
     "Phê duyệt": [
-        { value: "WAITING_FOR_APPROVAL", label: "Yêu cầu phê duyệt" },
-        { value: "REQUEST_APPROVAL", label: "Phê duyệt" },
-        { value: "APPROVING", label: "Từ chối" }
+        { value: "APPROVING", label: "Yêu cầu phê duyệt" },
+        { value: "WAITING_FOR_DISBURSEMENT", label: "Phê duyệt" },
+        { value: "REJECTED_CHECK_PD", label: "Từ chối" }
     ],
     "Giải ngân": [
-        { value: "WAITING_FOR_DISBURSEMENT", label: "Đợi giải ngân" },
         { value: "DISBURSED", label: "Đã giải ngân" }
     ]
 };
@@ -99,15 +100,14 @@ export default function PermissionForm() {
     //     console.log('Selected Permissions:', selectedPermissions);
     //     // Submit logic here
     // };
+    const [isModalVisible, setIsModalVisible] = useState(false); // State để điều khiển modal
 
     const handleSubmit = async () => {
         try {
             await Promise.all(
                 roles.map(async (role) => {
-                    // Tạo danh sách `apiCodes` từ các quyền đã chọn trong `selectedPermissions`
                     const apiCodes = Object.values(selectedPermissions[role.key]).flat();
                     if (apiCodes.length > 0) {
-                        // Gọi API để thêm quyền cho từng vai trò
                         const response = await addPermissionsToRole(role.key, apiCodes);
                         if (response) {
                             console.log(`Quyền đã được thêm cho vai trò ${role.title}:`, response);
@@ -115,35 +115,55 @@ export default function PermissionForm() {
                     }
                 })
             );
-            console.log("Quyền đã được cập nhật cho tất cả vai trò.");
+            setIsModalVisible(true); // Hiển thị modal khi cập nhật thành công
         } catch (error) {
             console.error("Lỗi khi cập nhật quyền:", error);
         }
     };
+    const handleModalClose = () => {
+        setIsModalVisible(false); // Đóng modal khi nhấn nút "OK"
+    };
 
     return (
+        <div className="permission-container">
+            <h2 style={{ textAlign: "left" }}>Phân quyền</h2>
+            {roles.map((role) => (
+                <Card key={role.key} title={role.title} className="role-card">
+                    {Object.keys(permissionsBySection).map((sectionKey) => (
+                        <div key={sectionKey} className="checkbox-group-container">
+                            <label className="section-label">{sectionKey}</label>
+                            <Checkbox.Group
+                                options={permissionsBySection[sectionKey]}
+                                value={selectedPermissions[role.key][sectionKey]}
+                                onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}
+                            />
+                        </div>
+                    ))}
+                </Card>
+            ))}
+            <Button type="primary" onClick={handleSubmit}>
+                Cập nhật
+            </Button>
 
+            {/* Modal thông báo cập nhật thành công */}
+            <Modal
+                visible={isModalVisible}
+                onOk={handleModalClose}
+                onCancel={handleModalClose}
+                footer={[
+                    <Button key="ok" style={{color:'#FFF', backgroundColor:'#7e57c2'}} onClick={handleModalClose}>
+                        OK
+                    </Button>,
+                ]}
+            >
+                <div style={{ display: 'flex', alignItems: 'center'}}>
 
-    <div className="permission-container">
-        <h2 style={{textAlign:"left"}}>Phân quyền</h2>
-        {roles.map((role) => (
-            <Card key={role.key} title={role.title} className="role-card">
-                {Object.keys(permissionsBySection).map((sectionKey) => (
-                    <div key={sectionKey} className="checkbox-group-container">
-                        <label className="section-label">{sectionKey}</label>
-                        <Checkbox.Group
-                            options={permissionsBySection[sectionKey]}
-                            value={selectedPermissions[role.key][sectionKey]}
-                            onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}
-                        />
+                    <div>
+                        <h3 style={{margin:'20px'}}>Thông báo</h3>
+                        <p><CheckCircleOutlined style={{ fontSize: '24px', color: 'green', marginRight: '10px' }} /> Phân quyền được cập nhật thành công</p>
                     </div>
-                ))}
-            </Card>
-        ))}
-        <Button type="primary" onClick={handleSubmit}>
-            Cập nhật
-        </Button>
-    </div>
-
-);
+                </div>
+            </Modal>
+        </div>
+    );
 }

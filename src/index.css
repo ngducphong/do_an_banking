@@ -297,6 +297,7 @@ input[type="text"], input[type="tel"], input[type="password"], input[type="date"
 
 /* Nút cập nhật */
 .ant-btn-primary {
+  float: right;
   background-color: #7e57c2;
   border-color: #7e57c2;
   font-size: 16px;
