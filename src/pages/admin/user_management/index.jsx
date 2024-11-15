@@ -75,6 +75,7 @@ export default function PermissionForm() {
                         updatedPermissions[role.key][sectionKey] = data
                             .filter(permission => sectionPermissions.includes(permission.code))
                             .map(permission => permission.code);
+
                     });
                 }
             }));
