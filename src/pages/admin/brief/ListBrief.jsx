@@ -1,9 +1,10 @@
 import {useCallback, useEffect, useState} from "react";
-import {Pagination, Table} from "antd";
+import {Button, Pagination, Table} from "antd";
 import moment from "moment/moment.js";
 import {useNavigate} from "react-router-dom";
 import {paging} from "../../../api/loanReqInfoAPIs.js";
 import {STATUSES} from "../../../utils/const.js";
+import {CloseSquareOutlined} from "@ant-design/icons";
 
 const ListBrief = () => {
     const [data, setData] = useState([]);
@@ -15,48 +16,48 @@ const ListBrief = () => {
     const columns = [
         {
             title: "Mã hồ sơ",
-            dataIndex: "maHoSo",
-            key: "maHoSo",
+            dataIndex: "mahoso",
+            key: "mahoso",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
         },
         {
             title: "Họ và tên",
-            dataIndex: "hoVaTen",
-            key: "hoVaTen",
+            dataIndex: "hoten",
+            key: "hoten",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
         },
         {
             title: "Sản phẩm vay",
-            dataIndex: "sanPhamVay",
-            key: "sanPhamVay",
+            dataIndex: "sanpham",
+            key: "sanpham",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
         },
         {
             title: "Số tiền vay",
-            dataIndex: "soTienVay",
-            key: "soTienVay",
+            dataIndex: "sotien",
+            key: "sotien",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
         },
         {
             title: "Kỳ hạn",
-            dataIndex: "kyHan",
-            key: "kyHan",
+            dataIndex: "kyhan",
+            key: "kyhan",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
         },
         {
             title: "Phương thức thanh toán",
-            dataIndex: "phuongThucThanhToan",
-            key: "phuongThucThanhToan",
+            dataIndex: "phuongthuc",
+            key: "phuongthuc",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
@@ -74,8 +75,8 @@ const ListBrief = () => {
         },
         {
             title: "Trạng thái",
-            dataIndex: "trangThai",
-            key: "trangThai",
+            dataIndex: "trangthai",
+            key: "trangthai",
             onHeaderCell: () => ({
                 style: { backgroundColor: "#CED0F8" },
             }),
@@ -94,7 +95,7 @@ const ListBrief = () => {
             const response = await paging({
                 pageIndex: currentPage,
                 pageSize: 10,
-                clickedCodes,
+                statusCodes: clickedCodes,
             });
             setData(response?.data?.result?.content || []);
             setTotalResults(response?.data?.result?.totalElements || 0);
@@ -129,17 +130,20 @@ const ListBrief = () => {
                 <h1 className="text-2xl font-bold mb-6">DANH SÁCH HỒ SƠ</h1>
                 <div className="ml-3 mr-3 grid grid-cols-8 gap-4 text-[10px]">
                     {STATUSES.map((status, index) => (
-                        <button
+                        <Button
                             key={index}
                             onClick={() => handleBadgeClick(index)}
-                            className={`inline-flex items-center px-4 py-2 rounded-lg cursor-pointer ${status.color} ${
+                            className={`inline-flex font-bold text-base items-center justify-start px-4 py-2 rounded-lg cursor-pointer ${status.color} ${
                                 clickedCodes.includes(status.code) ? "opacity-100" : "opacity-50"
                             }`}
                         >
-                            <span className="text-lg mr-2">✖</span>
+                            <span className="text-base mr-2">✖</span>
                             {status.label}
-                        </button>
+                        </Button>
                     ))}
+                    <div className="flex justify-center">
+                        <Button disabled={clickedCodes.length === 0} className="font-bold w-1/2" onClick={()=> setClickedCodes([])}><CloseSquareOutlined />Bỏ lọc</Button>
+                    </div>
                 </div>
             </div>
             <div className="mt-3 font-bold grid grid-cols-2 items-center">
