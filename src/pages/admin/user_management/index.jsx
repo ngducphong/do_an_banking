@@ -11,7 +11,7 @@ const roles = [
 
 // Updated permissionsBySection with objects containing label and value for each checkbox option
 const permissionsBySection = {
-    HoSo: [
+    "Hồ sơ": [
         { value: "RECEIVED", label: "Nhận" },
         { value: "REQUEST_CHECK", label: "Yêu cầu kiểm tra" },
         { value: "WAITING_FOR_CHECK", label: "Kiểm tra" },
@@ -23,22 +23,22 @@ const permissionsBySection = {
         { value: "WAITING_FOR_CIC_CHECK", label: "Check thành công" },
         { value: "CHECKING_CIC", label: "Từ chối" }
     ],
-    ThamDinhDT: [
+    "Thẩm định ĐT": [
         { value: "CIC_CHECK_SUCCESS", label: "Yêu cầu thẩm định" },
         { value: "WAITING_FOR_EVALUATION", label: "Thẩm định" },
         { value: "REQUEST_EVALUATION", label: "Từ chối" }
     ],
-    ThamDinhDB: [
+    "Thẩm định ĐB": [
         { value: "EVALUATING", label: "Yêu cầu thẩm định" },
         { value: "WAITING_FOR_FINAL_EVALUATION", label: "Thẩm định" },
         { value: "FINAL_EVALUATION", label: "Từ chối" }
     ],
-    PheDuyet: [
+    "Phê duyệt": [
         { value: "WAITING_FOR_APPROVAL", label: "Yêu cầu phê duyệt" },
         { value: "REQUEST_APPROVAL", label: "Phê duyệt" },
         { value: "APPROVING", label: "Từ chối" }
     ],
-    GiaiNgan: [
+    "Giải ngân": [
         { value: "WAITING_FOR_DISBURSEMENT", label: "Đợi giải ngân" },
         { value: "DISBURSED", label: "Đã giải ngân" }
     ]
@@ -122,25 +122,28 @@ export default function PermissionForm() {
     };
 
     return (
-        <div>
-            <h2>Phân quyền</h2>
-            {roles.map((role) => (
-                <Card key={role.key} title={role.title} style={{ marginBottom: 16 }}>
-                    {Object.keys(permissionsBySection).map((sectionKey) => (
-                        <div key={sectionKey} style={{ marginBottom: 12 }}>
-                            <label>{sectionKey}</label>
-                            <Checkbox.Group
-                                options={permissionsBySection[sectionKey]}
-                                value={selectedPermissions[role.key][sectionKey]}
-                                onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}
-                            />
-                        </div>
-                    ))}
-                </Card>
-            ))}
-            <Button type="primary" onClick={handleSubmit}>
-                Cập nhật
-            </Button>
-        </div>
-    );
+
+
+    <div className="permission-container">
+        <h2 style={{textAlign:"left"}}>Phân quyền</h2>
+        {roles.map((role) => (
+            <Card key={role.key} title={role.title} className="role-card">
+                {Object.keys(permissionsBySection).map((sectionKey) => (
+                    <div key={sectionKey} className="checkbox-group-container">
+                        <label className="section-label">{sectionKey}</label>
+                        <Checkbox.Group
+                            options={permissionsBySection[sectionKey]}
+                            value={selectedPermissions[role.key][sectionKey]}
+                            onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}
+                        />
+                    </div>
+                ))}
+            </Card>
+        ))}
+        <Button type="primary" onClick={handleSubmit}>
+            Cập nhật
+        </Button>
+    </div>
+
+);
 }

@@ -7,6 +7,7 @@ import FormForgotPassword from "../../../components/form/FormForgotPassword.jsx"
 import {Button} from "antd";
 import {editCategory} from "../../../api/categoryAPIs.js";
 import {resetPassword} from "../../../api/resetPasswordAPIs.js";
+import {Box, Grid} from "@mui/material";
 
 export default function Login() {
   // region state
@@ -57,39 +58,24 @@ export default function Login() {
     <>
       <div className="main-wrapper log-wrap">
         <div className="row">
-          <div className="col-md-6 login-bg">
-            <div className="owl-carousel login-slide owl-theme">
-              <div className="welcome-login">
-                <div className="login-banner">
-                  <img
-                    src="assets/img/login-img.png"
-                    className="img-fluid"
-                    alt="Logo"
-                  />
-                </div>
-                <div className="mentor-course text-center">
-                  <h2>
-                    Chào mừng bạn đến với <br />
-                    <span className="text-smart-learn">SmartLearn</span>
-                  </h2>
-                </div>
-              </div>
-            </div>
+          <div className="col-md-4 login-bg">
+            <Grid item xs={12} md={6} className="text-center">
+              <Box
+                  component="img"
+                  src="/assets/img/icon/homeimg.jpg" // Corrected image path
+                  alt="Credit Card Banner"
+                  sx={{
+                    maxWidth: "100%",
+                    boxShadow: 3,
+                  }}
+              />
+            </Grid>
           </div>
-          <div className="col-md-6 login-wrap-bg">
+          <div className="col-md-8 login-wrap-bg">
             <div className="login-wrapper">
               <div className="loginbox">
                 <div className="w-100">
-                  <div className="img-logo">
-                    <img
-                      src="assets/img/img.png"
-                      className="logo-local"
-                      alt="Logo"
-                    />
-                    <div className="back-home">
-                      <a href="/">Quay lại</a>
-                    </div>
-                  </div>
+
                   <h1>Đăng nhập</h1>
                   <div className="input-block">
                     <label className="form-control-label">Tên đăng nhập</label>
@@ -114,29 +100,6 @@ export default function Login() {
                       />
                       <span className="feather-eye toggle-password" />
                     </div>
-                  </div>
-                  <div className="forgot" style={{display:"inline-block"}}>
-                    <span  style={{display:"block"}}>
-                      <a className="forgot-link" href="/register">
-                        Bạn chưa có tài khoản ?{" "}
-                        <span className="text-rikkei">Tạo tài khoản</span>
-                      </a>
-                    </span>
-
-                    <span  style={{display:"block"}}>
-                      <Button type="link"  onClick={() => setIsFormForgotPassword(true)} style={{paddingLeft:"0px"}}>
-                        <span className="text-rikkei">Quên mật khẩu ?</span>
-                      </Button>
-                    </span>
-
-                    {
-                      isFormForgotPassword
-                        && (
-                        <FormForgotPassword
-                            closeForm={closedFormForgotPassword}
-                        />
-                    )}
-
                   </div>
 
 
