@@ -1,19 +1,6 @@
 import {notify} from "../utils/notification";
 import {jsonAxios} from "./api.base.url";
 import Cookies from "js-cookie";
-
-export const getPhone = async (user) => {
-    const infoUser = {
-        phone: user.phone,
-        fullName: user.fullName,
-    };
-    try {
-        const response = await jsonAxios.post("/api/v1/user-clipboard", infoUser);
-        return response;
-    } catch (error) {
-        console.log(error);
-    }
-};
 export const register = async (infoUser) => {
     const newUser = {
         username: infoUser.username,
@@ -30,7 +17,6 @@ export const register = async (infoUser) => {
         notify("error", "Đăng ký không thành công");
     }
 };
-
 export const loginApi = async (user) => {
     const infoUser = {
         username: user.username,
@@ -79,7 +65,6 @@ export const createUserName = async (fullname) => {
         notify("error", "Có lỗi xảy ra");
     }
 };
-
 export const getAllUsers = async (searchQuery) => {
     try {
         if (searchQuery) {
@@ -137,24 +122,6 @@ export const getAllUsers = async (searchQuery) => {
         }
     }
 };
-export const editUserApi = async (userData) => {
-    try {
-        await jsonAxios.put(
-            `/api/v1/user/admin/edit-user/${userData.id}`,
-            userData
-        );
-        notify("success", "Sửa thông tin người dùng thành công");
-    } catch (error) {
-        if (error.response.status === 401) {
-            notify("error", "Bạn không có quyền");
-        } else if (error.response.status === 400) {
-            notify("error", error.response.data);
-        } else {
-            notify("error", "Có lỗi xảy ra khi sửa người dùng");
-        }
-    }
-};
-
 export const changePassword = async (changePasswordRequest) => {
     try {
         await jsonAxios.put(
@@ -169,42 +136,6 @@ export const changePassword = async (changePasswordRequest) => {
             notify("error", error.response.data);
         } else {
             notify("error", "Có lỗi xảy ra khi đổi mật khẩu");
-        }
-    }
-};
-
-export const getUserAccountRegistrationData = async (year) => {
-    try {
-        year = year || 2024
-        const response = await jsonAxios.get(
-            `/api/v1/user/get-user-account-registration-data?year=${year}`
-        );
-        return response.data;
-    } catch (error) {
-        if (error.response.status === 401) {
-            notify("error", "Bạn không có quyền");
-        } else if (error.response.status === 400) {
-            notify("error", error.response.data);
-        } else {
-            notify("error", "Có lỗi xảy ra khi getUserAccountRegistrationData");
-        }
-    }
-};
-
-export const getPaymentChartData = async (year) => {
-    try {
-        year = year || 2024
-        const response = await jsonAxios.get(
-            `/api/v1/user/get-payment-chart-data?year=${year}`
-        );
-        return response.data;
-    } catch (error) {
-        if (error.response.status === 401) {
-            notify("error", "Bạn không có quyền");
-        } else if (error.response.status === 400) {
-            notify("error", error.response.data);
-        } else {
-            notify("error", "Có lỗi xảy ra khi getPaymentChartData");
         }
     }
 };
