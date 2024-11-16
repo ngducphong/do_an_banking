@@ -231,6 +231,7 @@ input[type="text"], input[type="tel"], input[type="password"], input[type="date"
 
 /* Container chung */
 .permission-container {
+  width: 100%;
   padding: 20px;
 }
 
@@ -244,7 +245,7 @@ input[type="text"], input[type="tel"], input[type="password"], input[type="date"
 
 /* Card (khung mỗi role) */
 .ant-card {
-  width: 1400px;
+  width: 100%;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
