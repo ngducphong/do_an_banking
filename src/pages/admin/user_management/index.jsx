@@ -133,6 +133,7 @@ export default function PermissionForm() {
                         <div key={sectionKey} className="checkbox-group-container">
                             <label className="section-label">{sectionKey}</label>
                             <Checkbox.Group
+                                className="css-checkbox-group"
                                 options={permissionsBySection[sectionKey]}
                                 value={selectedPermissions[role.key][sectionKey]}
                                 onChange={(checkedValues) => handleCheckboxChange(role.key, sectionKey, checkedValues)}

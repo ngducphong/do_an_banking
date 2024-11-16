@@ -310,3 +310,8 @@ input[type="text"], input[type="tel"], input[type="password"], input[type="date"
   background-color: #5e35b1;
   border-color: #5e35b1;
 }
+
+.css-checkbox-group{
+  position: absolute;
+  left: 200px !important;
+}
