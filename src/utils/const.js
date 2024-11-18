@@ -49,3 +49,24 @@ export const STATUSES = [
     {code: 'WAITING_FOR_DISBURSEMENT', label: "Chờ giải ngân", color: "bg-yellow-500"},
     {code: 'DISBURSED', label: "Đã từ chối", color: "bg-rose-400"},
 ];
+
+export const PERMISSIONS = [
+    { code: 'RECEIVED', label: 'Nhận' },
+    { code: 'WAITING_FOR_CHECK', label: 'Yêu cầu kiểm tra' },
+    { code: 'CHECKING', label: 'Kiểm tra' },
+    { code: 'WAITING_FOR_CIC_CHECK', label: 'Hoàn tất KT' },
+    { code: 'REJECTED_CHECK_HS', label: 'Từ chối hồ sơ' },
+    { code: 'CHECKING_CIC', label: 'Check CIC' },
+    { code: 'WAITING_FOR_EVALUATION', label: 'Check thành công' },
+    { code: 'REJECTED_CHECK_CIC', label: 'Từ chối CIC' },
+    { code: 'EVALUATING', label: 'Yêu cầu thẩm định' },
+    { code: 'WAITING_FOR_FINAL_EVALUATION', label: 'Thẩm định' },
+    { code: 'REJECTED_CHECK_DT', label: 'Từ chối Thẩm định DT' },
+    { code: 'FINAL_EVALUATION', label: 'Yêu cầu thẩm định' },
+    { code: 'WAITING_FOR_APPROVAL', label: 'Thẩm định' },
+    { code: 'REJECTED_CHECK_DB', label: 'Từ chối  Thẩm định DB' },
+    { code: 'APPROVING', label: 'Yêu cầu phê duyệt' },
+    { code: 'WAITING_FOR_DISBURSEMENT', label: 'Phê duyệt' },
+    { code: 'REJECTED_CHECK_PD', label: 'Từ chối Phê duyệt' },
+    { code: 'DISBURSED', label: 'Đã giải ngân' },
+];
