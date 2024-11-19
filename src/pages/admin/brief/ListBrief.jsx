@@ -120,10 +120,6 @@ const ListBrief = () => {
             }
         });
     };
-
-    useEffect(() => {
-        console.log('Clicked Codes:', clickedCodes);
-    }, [clickedCodes]); // Logs whenever clickedCodes changes
     return (
         <div className="p-6 w-full h-full ">
             <div className="mb-3 pb-3">
@@ -133,7 +129,7 @@ const ListBrief = () => {
                         <Button
                             key={index}
                             onClick={() => handleBadgeClick(index)}
-                            className={`inline-flex font-bold text-base items-center justify-start px-4 py-2 rounded-lg cursor-pointer ${status.color} ${
+                            className={`text-xs inline-flex font-bold items-center justify-start px-4 py-2 rounded-lg cursor-pointer ${status.color} ${
                                 clickedCodes.includes(status.code) ? "opacity-100" : "opacity-50"
                             }`}
                         >
@@ -157,8 +153,16 @@ const ListBrief = () => {
                     className="w-full h-full shadow-2xl bg-white rounded overflow-hidden"
                     columns={columns}
                     dataSource={data} // Use fetched data here
-                    pagination={false}
+                    pagination={true}
                     bordered
+                    onRow={(record) => {
+                        return {
+                            onClick: () => {
+                                console.log(record)
+                                navigate(`/admin/brief/action/${record.id}`)
+                            },
+                        };
+                    }}
                 />
                 <Pagination
                     className="custom-pagination text-center mt-[16px] justify-center text-2xl"

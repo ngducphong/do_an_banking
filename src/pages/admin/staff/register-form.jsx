@@ -1,25 +1,24 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import {
-    Button,
-    DatePicker,
+    Button, Card,
+    DatePicker, Form,
     Input,
     Radio,
     Select,
-    Typography,
 } from "antd";
 import {
     createUser,
     createUserName,
     findUserById,
 } from "../../../api/userAPIs.js";
-import {EyeInvisibleOutlined, EyeOutlined} from "@ant-design/icons";
+import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 import {GENDER, ROLE} from "../../../utils/const.js";
 import Popup from "../../../components/Popup/PopUp.jsx";
-import moment from "moment/moment.js";
-
-const {Title} = Typography;
+import PersonIcon from "@mui/icons-material/Person";
+import {Girl} from "@mui/icons-material";
+import moment from "moment";
 
 function RegisterForm() {
     const location = useLocation();
@@ -27,15 +26,7 @@ function RegisterForm() {
     const isEdit = location.pathname.includes("edit");
     const {id} = useParams(); // Access the id from the URL
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        fullname: null,
-        username: null,
-        phone: null,
-        password: null,
-        dob: null,
-        role: null,
-        gender: null,
-    });
+    const [form] = Form.useForm()
     const [popup, setPopUpProperties] = useState({
         message: null,
         onClose: null,
@@ -43,27 +34,22 @@ function RegisterForm() {
     });
     const [isPopupVisible, setPopupVisible] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [dateRequired, setDateRequired] = useState(false); // State for date requirement
-    const [genderRequired, setGenderRequired] = useState(false); // State for date requirement
+    const [username, setUserName] = useState(''); // State để lưu trữ mã hồ sơ
     useEffect(() => {
         const fetchUserData = async () => {
             if (id) {
                 try {
                     const response = await findUserById(id);
                     if (response?.data?.result) {
-                        console.log(response.data.result);
-                        setFormData({
-                            fullname: response.data.result.fullname,
-                            username: response.data.result.username,
-                            phone: response.data.result.phone,
-                            password: response.data.result.password,
-                            dob: response.data.result.dob
-                                ? moment(response.data.result.dob)
-                                : null, // Convert to moment object
-                            role: response.data.result.role,
-                            gender: response.data.result.gender,
-                        });
+                        setUserName(response?.data?.result?.username)
+                        Object.entries(response?.data?.result).forEach(([key, value]) => {
+                            if (['dob'].includes(key) && value) {
+                                // Chuyển đổi giá trị ngày sang moment nếu key là ngày
+                                form.setFieldValue(key, moment(value));
+                            } else {
+                                form.setFieldValue(key, value);
+                            }
+                        })
                     }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
@@ -71,31 +57,13 @@ function RegisterForm() {
             }
         };
         fetchUserData(); // Call the async function immediately
-    }, [id]); // Add dependencies to the effect
-    const handleDateChange = (date, dateString) => {
-        // Ensure date is valid
-        if (date) {
-            setFormData((prev) => ({
-                ...prev,
-                dob: date, // formatted string like "DD/MM/YYYY"
-            }));
-        } else {
-            // If date is cleared or invalid
-            setFormData((prev) => ({
-                ...prev,
-                dob: null,
-            }));
-        }
-    };
-    const toggleShowPassword = () => {
-        setShowPassword((prev) => !prev);
-    };
+    }, [form, id]); // Add dependencies to the effect
     const handleChange = (e) => {
         const {name, value} = e.target;
         if (name == "role") {
-            setFormData({...formData, [name]: [value]});
+            form.setFieldValue(name, [value])
         } else {
-            setFormData({...formData, [name]: value});
+            form.setFieldValue(name, value)
         }
     };
     const closePopUp = () => {
@@ -111,21 +79,10 @@ function RegisterForm() {
             type: type,
         });
     }
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setDateRequired(false);
-        setGenderRequired(false); // Set date required if not selected    // Set date required if not selected
-        if (!formData.dob) {
-            setDateRequired(true); // Set date required if not selected
-            return;
-        }
-        if (!formData.gender) {
-            setGenderRequired(true); // Set date required if not selected
-            return;
-        }
+    const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const response = await createUser(formData);
+            const response = await createUser(form.getFieldValue());
             if (response?.data?.code === 100200) {
                 setPopupVisible(true);
                 setPopUpP("Bạn đã tạo tài khoản thành công", closePopUp, "success")
@@ -141,150 +98,98 @@ function RegisterForm() {
     const generateUserName = async (fullname) => {
         try {
             if (fullname === "" || !fullname) {
-                setFormData((prev) => ({...prev, username: ""})); // Reset username
+                form.setFieldValue('username', null)
             } else {
                 const response = await createUserName(fullname);
-                setFormData((prev) => ({...prev, username: response?.data?.result})); // Update username
+                form.setFieldValue('username', response?.data?.result)
             }
         } catch (error) {
             console.log(error);
         }
     };
     return (
-        <div className=" w-full h-full bg-white grid grid-cols-2 items-center justify-center p-4 ">
-            {isPopupVisible && (
-                <Popup
-                    message={popup.message}
-                    onClose={popup.onClose}
-                    type={popup.type}
-                />
-            )}
-            <div className="bg-white rounded-lg p-6 w-full h-full">
-                <Button
-                    type="link"
-                    className="!p-0 !m-0 flex items-center font-bold mb-4 !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
-                    onClick={() => navigate(-1)}
-                >
-                    <KeyboardReturnIcon className="mr-2"/>
-                    {isView ? `Chi tiết tài khoản ${formData.username}` : "Back"}
-                </Button>
+        <>
+            {
+                !isView && !isEdit ? (
+                    <div className="w-full h-full bg-white grid grid-cols-2 items-center justify-center p-4 ">
+                        {isPopupVisible && (
+                            <Popup
+                                message={popup.message}
+                                onClose={popup.onClose}
+                                type={popup.type}
+                            />
+                        )}
+                        <Form initialValues={
+                            {
+                                fullname: null,
+                                username: null,
+                                phone: null,
+                                password: null,
+                                dob: null, // Convert to moment object
+                                role: null,
+                                gender: null
+                            }
+                        } onFinish={handleSubmit}
+                              size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
+                              labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
+                              wrapperCol={{span: 16}}>
+                            <Button
+                                type="link"
+                                className="!p-0 !m-0 flex items-center font-bold mb-4 !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
+                                onClick={() => navigate(-1)}>
+                                <KeyboardReturnIcon className="mr-2"/>
+                                {isView ? `Chi tiết tài khoản ${username}` : "Back"}
+                            </Button>
 
-                <div className="w-full h-full justify-center  flex items-center">
-                    <div className="w-3/4">
-                        {
-                            !isView && !isEdit ? (
-                                <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-                                    Tạo tài khoản
-                                </h2>
-                            ) : ''
-                        }
-
-                        <form onSubmit={handleSubmit}>
-                            <div className="space-y-4">
-                                <div className="flex pb-3">
-                                    <label className="flex w-32 text-gray-700 font-bold mb-1 items-center">
-                                        Họ và tên<span className="text-red-600">(*)</span>
-                                    </label>
-                                    <Input
-                                        type="text"
-                                        name="fullname"
-                                        value={formData.fullname}
-                                        onChange={handleChange}
-                                        required
-                                        disabled={isView}
-                                        onBlur={() => generateUserName(formData.fullname)}
-                                        className="w-1/3 border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                            <div className="w-full justify-center  flex items-center">
+                                <div className="w-3/4">
+                                    {
+                                        !isView && !isEdit ? (
+                                            <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+                                                Tạo tài khoản
+                                            </h2>
+                                        ) : ''
+                                    }
+                                </div>
+                            </div>
+                            <div className={'ml-12'}>
+                                <Form.Item required className={'w-full'} name={'fullname'}
+                                           label={<><PersonIcon/>Họ và tên</>}>
+                                    <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                           readOnly={isView}/>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'username'}
+                                           label={<><PersonIcon/>Username</>}>
+                                    <Input readOnly/>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'phone'}
+                                           label={<><PersonIcon/>SĐT</>}>
+                                    <Input readOnly={isView}/>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'password'}
+                                           label={<><PersonIcon/>Mật khẩu</>}>
+                                    <Input.Password
+                                        readOnly={isView}
+                                        iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
                                     />
-                                </div>
-
-                                <div className="flex pb-3 justify-center items-center">
-                                    <label className="flex w-32 text-gray-700 font-bold mb-1 items-center">
-                                        Username<span className="text-red-600">(*)</span>
-                                    </label>
-                                    <Input
-                                        type="text"
-                                        name="username"
-                                        readOnly={true}
-                                        disabled={true}
-                                        value={formData.username}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-1/3 border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
-                                    />
-                                </div>
-
-                                <div className="flex pb-3">
-                                    <label className="flex w-32 text-gray-700 font-bold mb-1 items-center">
-                                        SĐT <span className="text-red-600">(*)</span>
-                                    </label>
-                                    <Input
-                                        disabled={isView}
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-1/3 border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
-                                    />
-                                </div>
-
-                                <div className="flex pb-3">
-                                    <label className="flex w-32 text-gray-700 font-bold mb-1 items-center">
-                                        Mật khẩu <span className="text-red-600">(*)</span>
-                                    </label>
-                                    <div className="relative w-full">
-                                        <Input
-                                            disabled={isView}
-                                            type={showPassword ? "text" : "password"}
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
-                                        />
-                                        <span
-                                            className="absolute inset-y-0 right-2 flex items-center text-gray-600 hover:text-gray-900">
-                      {showPassword ? (
-                          <EyeInvisibleOutlined onClick={toggleShowPassword}/>
-                      ) : (
-                          <EyeOutlined onClick={toggleShowPassword}/>
-                      )}
-                    </span>
-                                    </div>
-                                </div>
-
-                                <div className="flex pb-3">
-                                    <label className="flex w-32 text-gray-700 font-bold mb-1 items-center">
-                                        Ngày sinh <span className="text-red-600">(*)</span>
-                                    </label>
+                                </Form.Item>
+                                <Form.Item
+                                    required
+                                    className={'w-full'}
+                                    name={'dob'}
+                                    label={<><PersonIcon/>Ngày sinh</>}
+                                >
                                     <DatePicker
-                                        disabled={isView}
-                                        defaultValue={null}
-                                        value={formData.dob} // Convert string to moment object
+                                        readOnly={isView}
                                         format={"DD/MM/YYYY"}
-                                        className={`w-full ${dateRequired ? "border-red-600" : ""}`} // Add red border if required
                                         placeholder="DD/MM/YYYY"
-                                        onChange={handleDateChange}
                                     />
-                                </div>
-                                {dateRequired && (
-                                    <div className="text-red-600 text-sm">
-                                        Ngày sinh là bắt buộc.
-                                    </div> // Error message
-                                )}
+                                </Form.Item>
 
-                                <div className="flex pb-3">
-                                    <Title
-                                        level={5}
-                                        className="flex w-32 text-gray-700 font-bold mb-1 items-center"
-                                    >
-                                        Vai trò <span className="text-red-600">(*)</span>
-                                    </Title>
-
+                                <Form.Item required className={'w-full'} name={'role'}
+                                           label={<><PersonIcon/>Vai trò</>}>
                                     <Select
-                                        name="role"
-                                        disabled={isView}
-                                        value={formData.role}
+                                        readOnly={isView}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             const syntheticEvent = {
@@ -301,56 +206,220 @@ function RegisterForm() {
                                             label: item.name,
                                         }))}
                                     />
-                                </div>
-                                <div className="flex pb-3">
-                                    <label className="flex w-32 text-gray-700 font-bold mb-1 items-center">
-                                        Giới tính <span className="text-red-600">(*)</span>
-                                    </label>
-                                    <Radio.Group
-                                        disabled={isView}
-                                        value={formData.gender}
-                                        name="gender"
-                                        onChange={handleChange}
-                                        className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
-                                        options={GENDER.map((item) => ({
-                                            value: item.id,
-                                            label: item.name,
-                                        }))}
-                                    ></Radio.Group>
-                                </div>
-                                {genderRequired && (
-                                    <div className="text-red-600 text-sm">
-                                        Giới tính là bắt buộc.
-                                    </div> // Error message
-                                )}
+                                </Form.Item>
+                                <Form.Item name={'gender'} label={<><Girl/> Giới tính</>}>
+                                    <Radio.Group readOnly={isView}
+                                                 className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                                 options={GENDER.map((item) => ({
+                                                     value: item.id, label: item.name,
+                                                 }))}>
+                                    </Radio.Group>
+                                </Form.Item>
                             </div>
                             {!isView && (
-                                <button
-                                    type="submit"
-                                    className={`w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${
+                                <div className={'w-full flex justify-center'}>
+                                    <Button
+                                        htmlType={'submit'}
+                                        className={`w-2/3 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${
+                                            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                                        }`}
+                                        readOnly={isSubmitting}
+                                    >
+                                        {isSubmitting
+                                            ? "Đang xử lý..."
+                                            : !isEdit
+                                                ? "Đăng ký"
+                                                : "Cập nhật"}
+                                    </Button>
+                                </div>
+
+                            )}
+                        </Form>
+                        <div className="flex justify-end">
+                            <img
+                                src="/assets/img/icon/creditimg.jpg"
+                                alt="Illustration"
+                                className="hidden md:block"
+                            />
+                        </div>
+                    </div>
+                ) : <div className="w-full h-full p-4 ">
+                    {isPopupVisible && (
+                        <Popup
+                            message={popup.message}
+                            onClose={popup.onClose}
+                            type={popup.type}
+                        />
+                    )}
+                    <Form initialValues={
+                        {
+                            fullname: null,
+                            username: null,
+                            phone: null,
+                            password: null,
+                            dob: null, // Convert to moment object
+                            role: null,
+                            gender: null
+                        }
+                    } onFinish={handleSubmit}
+                          size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
+                          labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
+                          wrapperCol={{span: 16}}>
+                        <Button
+                            type="link"
+                            className="!p-0 !m-0 mt-5 flex items-center font-bold !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
+                            onClick={() => navigate(-1)}>
+                            <KeyboardReturnIcon className="mr-2"/>
+                            {isView ? `Chi tiết tài khoản ${username}` : "Back"}
+                        </Button>
+
+                        <div className="w-full justify-center mt-10 flex items-center">
+                            <div className="w-3/4">
+                                {
+                                    !isView && !isEdit ? (
+                                        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+                                            Tạo tài khoản
+                                        </h2>
+                                    ) : ''
+                                }
+                            </div>
+                        </div>
+                        <Card className={'p-[30px] w-full bg-[#f3f4f6]'}>
+                            <div className={'w-full grid grid-cols-2'}>
+                                <div>
+                                    <Form.Item required className={'w-full'} name={'fullname'}
+                                               label={<><PersonIcon/>Họ và tên</>}>
+                                        <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                               readOnly={isView}/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'username'}
+                                               label={<><PersonIcon/>Username</>}>
+                                        <Input readOnly/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'phone'}
+                                               label={<><PersonIcon/>SĐT</>}>
+                                        <Input readOnly={isView}/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'password'}
+                                               label={<><PersonIcon/>Mật khẩu</>}>
+                                        <Input.Password
+                                            readOnly={isView}
+                                            iconRender={(visible) => (visible ? <EyeTwoTone/> :
+                                                <EyeInvisibleOutlined/>)}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item
+                                        required
+                                        className={'w-full'}
+                                        name={'dob'}
+                                        label={<><PersonIcon/>Ngày sinh</>}
+                                    >
+                                        <DatePicker
+                                            readOnly={isView}
+                                            format={"DD/MM/YYYY"}
+                                            placeholder="DD/MM/YYYY"
+                                        />
+                                    </Form.Item>
+
+                                    <Form.Item required className={'w-full'} name={'role'}
+                                               label={<><PersonIcon/>Vai trò</>}>
+                                        <Select
+                                            readOnly={isView}
+                                            onChange={(selectedValues) => {
+                                                // Create a synthetic event to match the expected structure
+                                                const syntheticEvent = {
+                                                    target: {
+                                                        name: "role",
+                                                        value: selectedValues, // Pass the selected values directly
+                                                    },
+                                                };
+                                                handleChange(syntheticEvent); // Call your existing handleChange
+                                            }}
+                                            className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                            options={ROLE.map((item) => ({
+                                                value: item.id,
+                                                label: item.name,
+                                            }))}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item name={'gender'} label={<><Girl/> Giới tính</>}>
+                                        <Radio.Group readOnly={isView}
+                                                     className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                                     options={GENDER.map((item) => ({
+                                                         value: item.id, label: item.name,
+                                                     }))}>
+                                        </Radio.Group>
+                                    </Form.Item>
+                                </div>
+                                <div>
+                                    <Form.Item required className={'w-full'} name={'CCCD'}
+                                               label={<><PersonIcon/>CCCD</>}>
+                                        <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                               readOnly={isView}/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'MVN'}
+                                               label={<><PersonIcon/>MVN</>}>
+                                        <Input readOnly/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'Tỉnh/TP'}
+                                               label={<><PersonIcon/>Tỉnh/TP</>}>
+                                        <Input readOnly={isView}/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'password'}
+                                               label={<><PersonIcon/>Quận/Huyện</>}>
+                                        <Input readOnly={isView}/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'password'}
+                                               label={<><PersonIcon/>Phường/Xã</>}>
+                                        <Input readOnly={isView}/>
+                                    </Form.Item>
+                                    <Form.Item required className={'w-full'} name={'role'}
+                                               label={<><PersonIcon/>Hiệu lực</>}>
+                                        <Select
+                                            readOnly={isView}
+                                            onChange={(selectedValues) => {
+                                                // Create a synthetic event to match the expected structure
+                                                const syntheticEvent = {
+                                                    target: {
+                                                        name: "role",
+                                                        value: selectedValues, // Pass the selected values directly
+                                                    },
+                                                };
+                                                handleChange(syntheticEvent); // Call your existing handleChange
+                                            }}
+                                            className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                            options={ROLE.map((item) => ({
+                                                value: item.id,
+                                                label: item.name,
+                                            }))}
+                                        />
+                                    </Form.Item>
+                                </div>
+                            </div>
+                        </Card>
+                        {!isView && (
+                            <div className={'w-full flex justify-center'}>
+                                <Button
+                                    htmlType={'submit'}
+                                    className={`w-2/3 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${
                                         isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                                     }`}
-                                    disabled={isSubmitting}
+                                    readOnly={isSubmitting}
                                 >
                                     {isSubmitting
                                         ? "Đang xử lý..."
                                         : !isEdit
                                             ? "Đăng ký"
                                             : "Cập nhật"}
-                                </button>
-                            )}
-                        </form>
-                    </div>
+                                </Button>
+                            </div>
+
+                        )}
+                    </Form>
                 </div>
-            </div>
-            <div className="flex justify-end">
-                <img
-                    src="/assets/img/icon/creditimg.jpg"
-                    alt="Illustration"
-                    className="hidden md:block"
-                />
-            </div>
-        </div>
+
+            }
+        </>
     );
 }
 

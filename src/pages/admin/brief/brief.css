@@ -1,0 +1,46 @@
+.ant-breadcrumb {
+    @apply w-full text-lg font-bold flex justify-center mt-8;
+
+    .ant-breadcrumb-link {
+        @apply text-black transition-colors cursor-pointer;
+    }
+
+    .ant-breadcrumb-link:hover {
+        @apply bg-[#bcc1ca];
+        /* Đảm bảo màu không thay đổi khi hover */
+    }
+
+    li {
+        @apply text-center
+    }
+
+    ol {
+        @apply grid grid-cols-7 w-full ml-[10%] mr-[10%] p-3 rounded-lg border-solid bg-[#bcc1ca]
+    }
+}
+
+.ant-form {
+    @apply ml-[10%] mr-[10%] p-3 rounded-lg h-full text-lg font-bold flex justify-center mt-8 bg-[#bcc1ca];
+}
+
+.ant-card-body {
+    padding: 0 !important;
+}
+
+.custom-input-form{
+    .ant-input,
+    .ant-input-number-affix-wrapper,
+    .ant-input-number,
+    .ant-picker {
+        @apply w-2/3 !important;
+    }
+}
+svg {
+    @apply mr-2 !important
+}
+.ant-input,
+.ant-input-number-affix-wrapper,
+.ant-input-number,
+.ant-picker {
+    @apply w-full !important;
+}

@@ -11,8 +11,8 @@ export default function LoanPopup({ isVisible, onClose }) {
       footer={null}
       closeIcon={<CloseOutlined />}
       className="custom-modal"
-      width="75vw"   // 75% of the viewport width
-      bodyStyle={{ height: '50vh' }}  // 75% of the viewport height
+      width="75vw"  // 75% of the viewport width
+      bodyStyle={{ height: '75vh' }}  // 75% of the viewport height
     >
       <div className="loan-popup-container">
         {/* Left Side */}

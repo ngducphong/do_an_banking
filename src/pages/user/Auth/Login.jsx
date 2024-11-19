@@ -24,9 +24,8 @@ export default function Login() {
     setIsLogining(true);
     try {
       const response = await loginApi({ username, password });
+      localStorage.setItem("user",JSON.stringify(response?.data?.result))
       const { token: accessToken, expiryTime, roles, type, username: fullName } = response?.data?.result;
-
-      localStorage.setItem("user", fullName);
       localStorage.setItem("roles", JSON.stringify(roles));
       // Lưu accessToken vào cookies
       Cookies.set("accessToken", accessToken, {

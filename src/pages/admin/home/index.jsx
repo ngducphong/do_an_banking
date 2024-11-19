@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Grid, Button, Typography, Box } from "@mui/material";
 import LoanPopup from "./popup/LoanPopup.jsx";
 
@@ -14,7 +14,7 @@ export default function HomeAdmin() {
   }, []);
 
   return (
-    <Grid container spacing={3} className="pt-20">
+    <Grid container spacing={3} className="pt-20 pb-20">
       {/* Left Side */}
       <Grid item xs={12} md={6}>
         <Box
@@ -55,16 +55,16 @@ export default function HomeAdmin() {
           <Box className="h-1/3 flex items-end">
             <Box className="flex items-end gap-6 justify-center rounded-full bg-slate-300 w-full h-1/2">
               <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
-                <span className="h-full w-full items-end flex text-[30px]">📞 Gọi điện tư vấn</span>
-                <span className="h-full w-full">Tư vấn sản phẩm vay</span>
+                <span className="h-full w-full items-end mb-2 flex text-[20px]">📞 Gọi điện tư vấn</span>
+                <span className="h-full w-full text-[16px]">Tư vấn sản phẩm vay</span>
               </Box>
               <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
-                <span className="h-full w-full items-end flex text-[30px]">🏦 Vay uy tín</span>
-                <span className="h-full w-full"> Quy trình phê duyệt nhanh</span>
+                <span className="h-full w-full items-end mb-2 flex text-[20px]">🏦 Vay uy tín</span>
+                <span className="h-full w-full text-[16px]"> Quy trình phê duyệt nhanh</span>
               </Box>
               <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
-                <span className="h-full w-full items-end flex text-[30px]"> 📉 Lãi suất thấp</span>
-                <span className="h-full w-full"> Lãi suất đảm bảo chi trả</span>
+                <span className="h-full w-full items-end mb-2 flex text-[20px]"> 📉 Lãi suất thấp</span>
+                <span className="h-full w-full text-[16px]"> Lãi suất đảm bảo chi trả</span>
               </Box>
             </Box>
           </Box>

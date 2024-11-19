@@ -9,3 +9,11 @@ export const paging = async (searchRequest) => {
         notify("error", "Có lỗi xảy ra");
     }
 }
+export const getLoan = async(id)=>{
+    try {
+        return await jsonAxios.get(`/loan-info/get-loan-by-id/${id}`);
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
