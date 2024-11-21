@@ -44,7 +44,7 @@ const Navbar = () => {
             Nhân viên
           </NavLink>
           <NavLink
-            to="/customers"
+            to="/admin/customer"
             className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
           >
             Khách hàng
