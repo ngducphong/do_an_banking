@@ -7,6 +7,8 @@ import PermissionsForm from "../pages/admin/user_management";
 import Login from "../pages/user/Auth/Login";
 import NotFound from "../pages/notfound/NotFound.jsx";
 import ActionBrief from "../pages/admin/brief/ActionBrief.jsx";
+import ListCustomer from "../pages/admin/customer/list-customer.jsx";
+import RegisterFormCustomer from "../pages/admin/customer/register-form-customer.jsx";
 
 const routesConfig = [
     {
@@ -18,6 +20,9 @@ const routesConfig = [
             {path: "staff/create", element: <RegisterForm/>},
             {path: "staff/view/:id", element: <RegisterForm/>},
             {path: "staff/edit/:id", element: <RegisterForm/>},
+            {path: "customer", element: <ListCustomer/>},
+            {path: "customer/view/:id", element: <RegisterFormCustomer/>},
+            {path: "customer/edit/:id", element: <RegisterFormCustomer/>},
             {path: "brief", element: <ListBrief/>},
             {path: "brief/action/:id", element: <ActionBrief/>},
             { path: "permissions", element: <PermissionsForm /> },

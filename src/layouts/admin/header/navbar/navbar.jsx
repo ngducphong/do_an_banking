@@ -47,8 +47,8 @@ const Navbar = () => {
             Nhân viên
           </NavLink>
           <NavLink
-            to="/customers"
-            className="font-bold text-black hover:text-[#9D4EDD] transition-colors"
+            to="/admin/customer"
+            className="font-bold hover:text-[#9D4EDD] transition-colors"
           >
             Khách hàng
           </NavLink>
