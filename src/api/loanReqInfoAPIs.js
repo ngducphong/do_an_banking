@@ -78,3 +78,12 @@ export const rejectedCheckHs = async (id, reason) => {
         notify("error", "Có lỗi xảy ra");
     }
 }
+
+export const countWaitingForReceipt = async () => {
+    try {
+        return await jsonAxios.get(`/loan-info/count-waiting-for-receipt`);
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
