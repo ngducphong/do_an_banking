@@ -1,8 +1,22 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
 import {Button, Dropdown} from "antd";
+import LoanPopup from "../../../../pages/admin/home/popup/LoanPopup.jsx";
 
 const Navbar = () => {
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            // Dữ liệu trong localStorage thường là chuỗi, cần parse nếu lưu dưới dạng JSON
+            const parsedData = JSON.parse(userData);
+            setUserName(parsedData.username);
+        } else {
+            console.log('Không có dữ liệu trong localStorage với key "user".');
+        }
+        }, []);
+
     const navigate = useNavigate()
     const items = [
         {
@@ -14,6 +28,29 @@ const Navbar = () => {
             ),
         },
     ]
+    const deleteCookie = (cookieName) => {
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    };
+
+    const handleLogout = () => {
+        // Xóa cookie accessToken
+        deleteCookie('accessToken');
+
+        // Xóa toàn bộ localStorage
+        localStorage.clear();
+
+        // Chuyển hướng người dùng đến trang đăng nhập
+        window.location.href = '/login';
+    };
+    const [isVisible, setIsVisible] = useState(false);
+
+    const handleButtonClick = () => {
+        setIsVisible(true);
+    };
+
+    const handleClosePopup = () => {
+        setIsVisible(false);
+    };
     return (
         <nav className="bg-[#F1ECFF] py-4 shadow-md">
             <div className="container mx-auto flex items-center justify-between px-6">
@@ -84,13 +121,35 @@ const Navbar = () => {
 
                 {/* Right side */}
                 <div className="flex items-center space-x-4">
-                    <Button className="font-bold bg-[#F1ECFF] border-none">
+                    <Button className="font-bold bg-[#F1ECFF] border-none"
+                            onClick={handleButtonClick}
+                    >
                         <i className="fas fa-bell"></i>
                         Thông báo
                         {/* Notification Icon */}
+
                     </Button>
-                    <Dropdown className="font-bold bg-[#F1ECFF] border-none" menu={{items}} placement="bottomLeft">
-                        <Button>Admin</Button>
+                    <LoanPopup isVisible={isVisible} onClose={handleClosePopup} />
+                    <Dropdown
+                        className="font-bold bg-[#F1ECFF] border-none"
+                        menu={{
+                            items: [
+                                {
+                                    key: 'logout',
+                                    label: (
+                                        <Button
+                                            onClick={handleLogout}
+                                            color="danger" variant="solid"
+                                        >
+                                            Đăng xuất
+                                        </Button>
+                                    ),
+                                },
+                            ],
+                        }}
+                        placement="bottomLeft"
+                    >
+                        <Button>{userName}</Button>
                     </Dropdown>
                 </div>
             </div>
