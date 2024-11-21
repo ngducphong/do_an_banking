@@ -132,7 +132,8 @@ label {
 
 .active {
   color: #bc2228 !important;
-}.custom-pagination .ant-pagination-item {
+}
+.custom-pagination .ant-pagination-item {
   background-color: #f0f0f0; /* Light gray background */
   border: none; /* Remove border */
   border-radius: 6px; /* Rounded corners */
@@ -289,17 +290,17 @@ a
   color: #333;
 }
 
-/* Nút cập nhật */
-.ant-btn-primary {
-  float: right;
-  background-color: #7e57c2;
-  border-color: #7e57c2;
-  font-size: 16px;
-  font-weight: bold;
-  width: 100px;
-  height: 40px;
-  margin-top: 20px;
-}
+/*!* Nút cập nhật *!*/
+/*.ant-btn-primary {*/
+/*  float: right;*/
+/*  background-color: #7e57c2;*/
+/*  border-color: #7e57c2;*/
+/*  font-size: 16px;*/
+/*  font-weight: bold;*/
+/*  width: 100px;*/
+/*  height: 40px;*/
+/*  margin-top: 20px;*/
+/*}*/
 
 .ant-btn-primary:hover {
   background-color: #5e35b1;
@@ -309,4 +310,7 @@ a
 .css-checkbox-group{
   position: absolute;
   left: 200px !important;
+}
+.ant-btn{
+  @apply hover:bg-blue-300 !important
 }

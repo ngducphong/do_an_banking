@@ -49,7 +49,6 @@ export const STATUSES = [
     {code: 'WAITING_FOR_DISBURSEMENT', label: "Chờ giải ngân", color: "bg-yellow-500"},
     {code: 'DISBURSED', label: "Đã từ chối", color: "bg-rose-400"},
 ];
-
 export const PERMISSIONS = [
     { code: 'RECEIVED', label: 'Nhận' },
     { code: 'WAITING_FOR_CHECK', label: 'Yêu cầu kiểm tra' },

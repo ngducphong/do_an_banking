@@ -52,8 +52,8 @@ export default function HomeAdmin() {
               Xem sản phẩm vay ngay!
             </Button>{" "}
           </Box>
-          <Box className="h-1/3 flex items-end">
-            <Box className="flex items-end gap-6 justify-center rounded-full bg-slate-300 w-full h-1/2">
+          <Box className="h-1/3 flex items-end ">
+            <Box className="grid p-[10px] grid-cols-3 items-end gap-6 justify-center rounded-full bg-slate-300 w-full h-1/2">
               <Box className="h-full grid grid-cols-1 text-[#9D4EDD] text-[20px] place-items-center">
                 <span className="h-full w-full items-end mb-2 flex text-[20px]">📞 Gọi điện tư vấn</span>
                 <span className="h-full w-full text-[16px]">Tư vấn sản phẩm vay</span>
