@@ -1,7 +1,9 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
+import {Button} from "antd";
 
 const Navbar = () => {
+  const navigate = useNavigate()
   return (
     <nav className="bg-[#F1ECFF] py-4 shadow-md">
       <div className="container mx-auto flex items-center justify-between px-6">
@@ -29,7 +31,8 @@ const Navbar = () => {
           </div>
 
           <span
-            className="ml-2 text-xl font-bold text-[#6d5173]"
+            className="ml-2 text-2xl font-bold text-[#6d5173] cursor-pointer"
+            onClick={()=>navigate('/admin')}
           >
             Transcent
           </span>
@@ -39,56 +42,47 @@ const Navbar = () => {
         <div className="flex items-center gap-8">
           <NavLink
             to="/admin/staff"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
+            className=" font-bold text-black hover:text-[#9D4EDD] transition-colors"
           >
             Nhân viên
           </NavLink>
           <NavLink
             to="/customers"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
+            className="font-bold text-black hover:text-[#9D4EDD] transition-colors"
           >
             Khách hàng
           </NavLink>
           <NavLink
             to="/admin/permissions"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
+            className="font-bold text-black hover:text-[#9D4EDD] transition-colors"
           >
             Phân quyền
           </NavLink>
           <NavLink
             to="/admin/brief"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
+            className="font-bold text-black hover:text-[#9D4EDD] transition-colors"
           >
             Hồ sơ
           </NavLink>
           <NavLink
             to="/info"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
+            className="font-bold text-black hover:text-[#9D4EDD] transition-colors"
           >
             Thông tin
-          </NavLink>
-          <NavLink
-            to="/notifications"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
-          >
-            Thông báo
-          </NavLink>
-          <NavLink
-            to="/admin"
-            className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors"
-          >
-            Admin
           </NavLink>
         </div>
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
-          <button className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors">
-            <i className="fas fa-bell"></i> {/* Notification Icon */}
-          </button>
-          <button className="text-[#5E548E] hover:text-[#9D4EDD] transition-colors">
+          <Button className="font-bold bg-[#F1ECFF] border-none">
+            <i className="fas fa-bell"></i>
+            Thông báo
+            {/* Notification Icon */}
+          </Button>
+          <Button className="font-bold bg-[#F1ECFF] border-none">
             <i className="fas fa-user-circle"></i> {/* Admin Icon */}
-          </button>
+            Admin
+          </Button>
         </div>
       </div>
     </nav>
