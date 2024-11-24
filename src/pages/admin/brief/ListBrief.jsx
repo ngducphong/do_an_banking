@@ -124,23 +124,33 @@ const ListBrief = () => {
         <div className="p-6 w-full h-full ">
             <div className="mb-3 pb-3">
                 <h1 className="text-2xl font-bold mb-6">DANH SÁCH HỒ SƠ</h1>
-                <div className="ml-3 mr-3 grid grid-cols-8 gap-4 text-[10px]">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-xs">
                     {STATUSES.map((status, index) => (
-                        <Button
+                        <button
                             key={index}
                             onClick={() => handleBadgeClick(index)}
-                            className={`text-xs inline-flex font-bold items-center justify-start px-4 py-2 rounded-lg cursor-pointer ${status.color} ${
-                                clickedCodes.includes(status.code) ? "opacity-100" : "opacity-50"
+                            className={`h-full flex items-center justify-start px-4 py-2 rounded-lg cursor-pointer font-bold ${
+                                clickedCodes.includes(status.code)
+                                    ? `${status.color} text-white`
+                                    : `${status.color} text-${status.color}-600 opacity-50`
                             }`}
                         >
                             <span className="text-base mr-2">✖</span>
                             {status.label}
-                        </Button>
+                        </button>
                     ))}
-                    <div className="flex justify-center">
-                        <Button disabled={clickedCodes.length === 0} className="font-bold w-1/2" onClick={()=> setClickedCodes([])}><CloseSquareOutlined />Bỏ lọc</Button>
+                    <div className="col-span-2 md:col-span-4 lg:col-span-8 flex justify-center">
+                        <button
+                            disabled={clickedCodes.length === 0}
+                            className="font-bold px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => setClickedCodes([])}
+                        >
+                            <CloseSquareOutlined className="text-base mr-2"/>
+                            Bỏ lọc
+                        </button>
                     </div>
                 </div>
+
             </div>
             <div className="mt-3 font-bold grid grid-cols-2 items-center">
                 <div className="text-2xl ml-3">Tất cả tài khoản hồ sơ vay</div>

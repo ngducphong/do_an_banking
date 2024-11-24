@@ -27,6 +27,13 @@ export const GENDER = [{
     id: false,
     name: "Nữ"
 }]
+export const ACTIVE = [{
+    id: true,
+    name: "Đang hoạt động (Active)"
+}, {
+    id: false,
+    name: "Không hoạt động (Unactive)"
+}]
 export const CONVERT_ROLE = (roles) => {
     return roles.map(roleId => {
         const role = ROLE.find(r => r.id === roleId);

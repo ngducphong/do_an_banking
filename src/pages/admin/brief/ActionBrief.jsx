@@ -1,13 +1,13 @@
-import {Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, Modal, Radio, Spin} from 'antd';
+import {Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, Modal, notification, Radio, Spin} from 'antd';
 import './brief.css'
-import {GENDER, STATUSES} from "../../../utils/const.js";
+import {GENDER, PERMISSIONS, STATUSES} from "../../../utils/const.js";
 import ArticleIcon from '@mui/icons-material/Article';
 import PersonIcon from "@mui/icons-material/Person";
 import {
     AccessAlarm, CalendarMonth, CreditCard, Girl, OpenInBrowser, Phone, TrendingUp, ViewDay
 } from "@mui/icons-material";
 import SaveAltIcon from "@mui/icons-material/SaveAlt";
-import {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {
     checkingCicLoanReqInfo,
@@ -21,6 +21,7 @@ import {
 import moment from "moment";
 import {InfoCircleOutlined, LoadingOutlined} from "@ant-design/icons";
 import {getCicInformationByIdNumber} from "../../../api/cicAPIs.js";
+import {getPermission} from "../../../api/permissionAPIs.js";
 
 const ActionBrief = () => {
     const {id} = useParams(); // Lấy id từ URL
@@ -32,10 +33,19 @@ const ActionBrief = () => {
     const [cic, setCic] = useState(null);
     const user = JSON.parse(localStorage.getItem('user'))
     const [reason, setReason] = useState("");
+    const [permissions, setPermissions] = useState([])
+    const [api, contextHolder] = notification.useNotification();
+
+    const openNotification = () => {
+        api.warning({
+            message: `Notification`,
+            description: 'hello',
+            placement: 'topRight',
+        });
+    };
     const handleOk = () => {
         setIsModalOpen(false);
     };
-
     const handleCancel = () => {
         setCic(null)
         setIsModalOpen(false);
@@ -74,8 +84,12 @@ const ActionBrief = () => {
             console.error('Failed to fetch loan data:', error);
         }
     }, [id, loan]);
-
+    const getPermissions = async () => {
+        const response = await getPermission(user.roles[0])
+        setPermissions(response.data)
+    }
     useEffect(() => {
+        getPermissions()
         fetchData();
     }, [fetchData, id]);
     const getCicInformation = async (idNumber) => {
@@ -97,7 +111,7 @@ const ActionBrief = () => {
     const actionLoan = async (loanId) => {
         try {
             let response
-            if (trangthai === STATUSES[0].code) {
+            if (trangthai === STATUSES[0].code && permissions.includes(PERMISSIONS[0].code)) {
                 response = await receiveLoan(loanId);
             } else if (trangthai === STATUSES[1].code) {
                 response = await waitingForCheckLoanReqInfo(loanId);
@@ -114,7 +128,7 @@ const ActionBrief = () => {
             } else if (trangthai === STATUSES[6].code) {
                 response = await waitingForEvaluationLoanReqInfo(loanId);
             } else {
-                return
+                openNotification()
             }
             const data = response?.data?.result;
 
@@ -213,17 +227,17 @@ const ActionBrief = () => {
                             || (route.title === 'Đã từ chối' && trangthai === 'REJECTED_CHECK')) ? 'text-red-500' : 'text-black'}>{route.title}</span>);
                 }}
                 items={trangthai !== 'REJECTED_CHECK' ? [{title: 'Chờ tiếp nhận HS',},
-                    {title: 'Đã tiếp nhận HS'},
-                    {title: 'Chờ KT'},
-                    {title: 'Đang KT'},
-                    {title: 'Chờ check CIC'},
-                    {title: 'Đang check CIC'},
-                    {title: 'Chờ thẩm định ĐT'},
-                    {title: 'Đang thẩm định ĐT'},
-                    {title: 'Chờ thẩm định ĐB'}].slice(currentIndex, currentIndex + 4) :
+                        {title: 'Đã tiếp nhận HS'},
+                        {title: 'Chờ KT'},
+                        {title: 'Đang KT'},
+                        {title: 'Chờ check CIC'},
+                        {title: 'Đang check CIC'},
+                        {title: 'Chờ thẩm định ĐT'},
+                        {title: 'Đang thẩm định ĐT'},
+                        {title: 'Chờ thẩm định ĐB'}].slice(currentIndex, currentIndex + 4) :
                     [{title: 'Đang KT'},
-                    {title: 'Đã từ chối'},
-                ]} // Hiển thị 4 mục đầu tiên hoặc logic tùy chỉnh
+                        {title: 'Đã từ chối'},
+                    ]} // Hiển thị 4 mục đầu tiên hoặc logic tùy chỉnh
             />
             <Form initialValues={{
                 id: null,
@@ -249,20 +263,21 @@ const ActionBrief = () => {
                         <span>&lt; KHOẢN VAY {loan.getFieldValue('mahoso')}</span>
                     </div>
                     <div>
-                        {trangthai === STATUSES[0].code ? <Button className={'mt-3 bg-[#CED0F8] text-white'}
-                                                                  htmlType={'submit'}>Nhận</Button> : trangthai === STATUSES[1].code ?
-                            <Button className={'mt-3 bg-[#CED0F8] text-white'} htmlType={'submit'}>Y/C kiểm
+                        {trangthai === STATUSES[0].code ? <Button className={'mt-3 bg-[#CED0F8]'}
+                                                                  htmlType={'submit'}
+                        >Nhận</Button> : trangthai === STATUSES[1].code ?
+                            <Button className={'mt-3 bg-[#CED0F8] '} htmlType={'submit'}>Y/C kiểm
                                 tra</Button> : trangthai === STATUSES[2].code ?
-                                <Button className={'mt-3 bg-[#CED0F8] text-white'} htmlType={'submit'}>Kiểm
+                                <Button className={'mt-3 bg-[#CED0F8]'} htmlType={'submit'}>Kiểm
                                     tra</Button> : trangthai === STATUSES[3].code ? <div className={'flex'}>
-                                    <Button className={'mt-3 bg-[#CED0F8] text-white hover:bg-sky-700'}
+                                    <Button className={'mt-3 bg-[#CED0F8]'}
                                             htmlType={'submit'}>Hoàn tất KT</Button>
                                     <Button onClick={() => {
                                         setIsModalRefuseOpen(true)
-                                    }} className={'mt-3 bg-red-500 ml-5 text-white hover:bg-sky-700'}
+                                    }} className={'mt-3 bg-red-500 ml-5 '}
                                             htmlType={'button'}>Từ chối</Button>
                                 </div> : trangthai === STATUSES[4].code ?
-                                    <Button className={'mt-3 bg-[#CED0F8] text-white'} htmlType={'submit'}>Check
+                                    <Button className={'mt-3 bg-[#CED0F8]'} htmlType={'submit'}>Check
                                         CIC</Button> : ''}
                     </div>
                     <Card className={'mt-4 mb-4'}>

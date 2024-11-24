@@ -311,6 +311,8 @@ a
   position: absolute;
   left: 200px !important;
 }
-.ant-btn{
-  @apply hover:bg-blue-300 !important
+.custom-hover-button{
+  .ant-btn{
+    @apply hover:bg-blue-300 !important
+  }
 }
