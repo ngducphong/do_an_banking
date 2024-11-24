@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import {
-    Button, Card, DatePicker, Form, Input, Radio, Select,
+    Button, Card, DatePicker, Form, Input, notification, Radio, Select,
 } from "antd";
 import {
     createUser, createUserName, findUserById,
@@ -23,6 +23,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import {fetchDistricts, fetchProvinces, fetchWards} from "../../../api/locationAPIs.js";
+import dayjs from "dayjs";
 
 function RegisterForm() {
     const location = useLocation();
@@ -40,10 +41,18 @@ function RegisterForm() {
     const [province, setProvinces] = useState([])// State để lưu trữ mã hồ sơ
     const [district, setDistricts] = useState()// State để lưu trữ mã hồ sơ
     const [ward, setWards] = useState()// State để lưu trữ mã hồ sơ
+    const [api, contextHolder] = notification.useNotification();
+
     useEffect(() => {
         fetchUserData();
         getListProvince()// Call the async function immediately
     }, [form, id]);
+    const openNotificationWithIcon = (type, message, description) => {
+        api[type]({
+            message: message,
+            description: description,
+        });
+    };
     const fetchUserData = async () => {
         if (id) {
             try {
@@ -100,20 +109,31 @@ function RegisterForm() {
     }
     const handleSubmit = async () => {
         setIsSubmitting(true);
+
         try {
             const response = await createUser(form.getFieldValue());
+
             if (response?.data?.code === 100200) {
-                setPopupVisible(true);
-                setPopUpP("Bạn đã tạo tài khoản thành công", closePopUp, "success")
+                // Show success notification
+                openNotificationWithIcon('success', 'Thành công', 'Thêm mới nhân viên thành công');
+
+                // Use a delayed navigation with state
+                setTimeout(() => {
+                    navigate('/admin/staff', {state: {success: true}});
+                }, 500); // Slight delay to ensure the notification is rendered
             }
-            console.log(response);
         } catch (error) {
-            setPopUpP("Có lỗi xảy ra", closePopUp, "warning")
-            console.error("Error submitting form:", error);
+            openNotificationWithIcon('error', 'Lỗi', 'Có lỗi xảy ra trong quá trình thêm mới nhân viên');
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    useEffect(() => {
+        if (location.state?.success) {
+            openNotificationWithIcon('success', 'Thành công', 'Thêm mới nhân viên thành công');
+        }
+    }, [location.state]);
     const generateUserName = async (fullname) => {
         try {
             if (fullname === "" || !fullname) {
@@ -127,6 +147,7 @@ function RegisterForm() {
         }
     };
     return (<>
+        {contextHolder}
         {!isView && !isEdit ? (
                 <div className="w-full h-full bg-white grid grid-cols-2 items-center justify-center p-4 ">
                     {isPopupVisible && (<Popup
@@ -202,6 +223,10 @@ function RegisterForm() {
                                        label={<><PersonIcon/>Ngày sinh</>}
                             >
                                 <DatePicker
+                                    disabledDate={(current) => {
+                                        // Can not select days before today and today
+                                        return current && current > dayjs().endOf('day');
+                                    }}
                                     readOnly={isView}
                                     format={"DD/MM/YYYY"}
                                     placeholder="DD/MM/YYYY"
@@ -325,6 +350,10 @@ function RegisterForm() {
                                     label={<><CalendarViewDayIcon/>Ngày sinh</>}
                                 >
                                     <DatePicker
+                                        disabledDate={(current) => {
+                                            // Can not select days before today and today
+                                            return current && current > dayjs().endOf('day');
+                                        }}
                                         readOnly={isView}
                                         format={"DD/MM/YYYY"}
                                         placeholder="DD/MM/YYYY"
