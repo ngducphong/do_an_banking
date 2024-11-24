@@ -357,7 +357,7 @@ const ActionBrief = () => {
                                     format={"DD/MM/YYYY"}
                                     placeholder="DD/MM/YYYY"/>
                             </Form.Item>
-                            <Form.Item name={'sotienvay'} label={<><CreditCard/>Số tiền vay</>}>
+                            <Form.Item name={'laisuat'} label={<><CreditCard/>Lãi suất</>}>
                                 <InputNumber
                                     readOnly
                                     min={0}
