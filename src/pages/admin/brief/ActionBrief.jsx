@@ -86,7 +86,7 @@ const ActionBrief = () => {
     }, [id, loan]);
     const getPermissions = async () => {
         const response = await getPermission(user.roles[0])
-        setPermissions(response.data)
+        setPermissions(response.data?.map(permissions => permissions.code))
     }
     useEffect(() => {
         getPermissions()
@@ -111,24 +111,35 @@ const ActionBrief = () => {
     const actionLoan = async (loanId) => {
         try {
             let response
-            if (trangthai === STATUSES[0].code && permissions.includes(PERMISSIONS[0].code)) {
-                response = await receiveLoan(loanId);
-            } else if (trangthai === STATUSES[1].code) {
-                response = await waitingForCheckLoanReqInfo(loanId);
-            } else if (trangthai === STATUSES[2].code) {
-                response = await checkingLoanReqInfo(loanId);
-            } else if (trangthai === STATUSES[3].code) {
-                response = await waitingForCicCheckLoanReqInfo(loanId);
-            } else if (trangthai === STATUSES[4].code) {
-                setIsModalOpen(true)
-                response = await checkingCicLoanReqInfo(loanId);
-                await getCicInformation(loan.getFieldValue('cccd'))
-            } else if (trangthai === STATUSES[5].code) {
-                response = await waitingForEvaluationLoanReqInfo(loanId);
-            } else if (trangthai === STATUSES[6].code) {
-                response = await waitingForEvaluationLoanReqInfo(loanId);
+            console.log(user)
+            if (permissions.includes(trangthai)) {
+                switch (trangthai) {
+                    case STATUSES[0].code:
+                        response = await receiveLoan(loanId);
+                        break;
+                    case STATUSES[1].code:
+                        response = await waitingForCheckLoanReqInfo(loanId);
+                        break;
+                    case STATUSES[2].code:
+                        response = await checkingLoanReqInfo(loanId);
+                        break;
+                    case STATUSES[3].code:
+                        response = await waitingForCicCheckLoanReqInfo(loanId);
+                        break;
+                    case STATUSES[4].code:
+                        setIsModalOpen(true);
+                        response = await checkingCicLoanReqInfo(loanId);
+                        await getCicInformation(loan.getFieldValue('cccd'));
+                        break;
+                    case STATUSES[5].code:
+                    case STATUSES[6].code:
+                        response = await waitingForEvaluationLoanReqInfo(loanId);
+                        break;
+                    default:
+                        openNotification("Không tìm thấy trạng thái phù hợp");
+                }
             } else {
-                openNotification()
+                openNotification("Bạn không có quyền thực hiện thao tác này");
             }
             const data = response?.data?.result;
 
