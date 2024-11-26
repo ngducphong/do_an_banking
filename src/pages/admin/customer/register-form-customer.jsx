@@ -74,7 +74,9 @@ function RegisterFormCustomer() {
         };
         fetchUserData(); // Call the async function immediately
     }, [form, id]); // Add dependencies to the effect
-
+    useEffect(() => {
+        getListProvince()// Call the async function immediately
+    })
     const closePopUp = () => {
         setPopupVisible(false);
         if (popup.type === 'success') {
@@ -126,6 +128,14 @@ function RegisterFormCustomer() {
             }
         } catch (error) {
             console.log(error);
+        }
+    };
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        if (name == "role") {
+            form.setFieldValue(name, [value])
+        } else {
+            form.setFieldValue(name, value)
         }
     };
     return (<>
@@ -307,12 +317,12 @@ function RegisterFormCustomer() {
                             <div>
                                 <Form.Item required className={'w-full'} name={'fullname'}
                                            label={<><PersonIcon/>Họ và tên</>}>
-                                    <Input  onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                            disabled={isView}/>
+                                    <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                           disabled={isView || isEdit}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'username'}
                                            label={<><BadgeIcon/>Username</>}>
-                                    <Input disabled={isView}/>
+                                    <Input disabled={isView || isEdit}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'phone'}
                                            label={<><LocalPhoneIcon/>SĐT</>}>
@@ -332,12 +342,11 @@ function RegisterFormCustomer() {
                                     label={<><CalendarViewDayIcon/>Ngày sinh</>}
                                 >
                                     <DatePicker
-                                        disabled={isView}
+                                        disabled={isView || isEdit}
                                         disabledDate={(current) => {
                                             // Can not select days before today and today
                                             return current && current > dayjs().endOf('day');
                                         }}
-                                        disabled={isView}
                                         format={"DD/MM/YYYY"}
                                         placeholder="DD/MM/YYYY"
                                     />
@@ -363,7 +372,7 @@ function RegisterFormCustomer() {
                                     />
                                 </Form.Item>
                                 <Form.Item required={true} name={'gender'} label={<><Girl/> Giới tính</>}>
-                                    <Radio.Group disabled={isView}
+                                    <Radio.Group disabled={isView || isEdit}
                                                  className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
                                                  options={GENDER.map((item) => ({
                                                      value: item.id, label: item.name,
@@ -375,16 +384,16 @@ function RegisterFormCustomer() {
                                 <Form.Item required className={'w-full'} name={'cin'}
                                            label={<><CreditCardIcon/>CCCD</>}>
                                     <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                           disabled={isView}/>
+                                           disabled={isView || isEdit}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'cin'}
                                            label={<><SwitchAccountIcon/>MVN</>}>
-                                    <Input disabled={isView}/>
+                                    <Input disabled={isView || isEdit}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'province'}
                                            label={<><LocationOnIcon/>Tỉnh/TP</>}>
                                     <Select
-                                        disabled={isView}
+                                        disabled={isView || isEdit}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             getListDistrict(selectedValues); // Call your existing handleChange
@@ -398,7 +407,7 @@ function RegisterFormCustomer() {
                                 <Form.Item required className={'w-full'} name={'district'}
                                            label={<><LocationOnIcon/>Quận/Huyện</>}>
                                     <Select
-                                        disabled={isView}
+                                        disabled={isView || isEdit}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             getListWard(selectedValues); // Call your existing handleChange
@@ -411,7 +420,7 @@ function RegisterFormCustomer() {
                                 <Form.Item required className={'w-full'} name={'ward'}
                                            label={<><LocationOnIcon/>Phường/Xã</>}>
                                     <Select
-                                        disabled={isView}
+                                        disabled={isView || isEdit}
                                         allowClear
                                         options={ward?.map((item) => ({
                                             value: item.code, label: item.name,
@@ -421,7 +430,7 @@ function RegisterFormCustomer() {
                                 <Form.Item required className={'w-full'} name={'active'}
                                            label={<><BoltIcon/>Hiệu lực</>}>
                                     <Select
-                                        disabled={isView}
+                                        disabled={isView || isEdit}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             const syntheticEvent = {
