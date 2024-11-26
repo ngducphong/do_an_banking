@@ -7,14 +7,6 @@ export default ({ mode }) => {
   return defineConfig({
     plugins: [react()],
     server: {
-      proxy: {
-        '/api': {
-          target: 'https://provinces.open-api.vn',
-          changeOrigin: true, // Ensures the host header of the request matches the target
-          rewrite: (path) => path.replace(/^\/api/, ''), // Removes `/api` prefix before forwarding
-        },
-      },
-      port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 4200,
-    },
-  });
+      port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 4200
+    }});
 };

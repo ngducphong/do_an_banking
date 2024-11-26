@@ -111,12 +111,6 @@ const Navbar = () => {
                     >
                         Hồ sơ
                     </NavLink>
-                    <NavLink
-                        to="/info"
-                        className="font-bold text-black hover:text-[#9D4EDD] transition-colors"
-                    >
-                        Thông tin
-                    </NavLink>
                 </div>
 
                 {/* Right side */}

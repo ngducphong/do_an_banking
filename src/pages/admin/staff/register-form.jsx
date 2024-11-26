@@ -5,7 +5,7 @@ import {
     Button, Card, DatePicker, Form, Input, notification, Radio, Select,
 } from "antd";
 import {
-    createUser, createUserName, findUserById,
+    createUser, createUserName, findUserById, updateUser,
 } from "../../../api/userAPIs.js";
 import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 import {ACTIVE, GENDER, ROLE} from "../../../utils/const.js";
@@ -96,27 +96,24 @@ function RegisterForm() {
             form.setFieldValue(name, value)
         }
     };
-    const closePopUp = () => {
-        setPopupVisible(false);
-        if (popup.type === 'success') {
-            navigate(-1);
-        }
-    };
-    const setPopUpP = (message, onClose, type) => {
-        setPopUpProperties({
-            message: message, onClose: onClose, type: type,
-        });
-    }
     const handleSubmit = async () => {
         setIsSubmitting(true);
 
         try {
-            const response = await createUser(form.getFieldValue());
+            let response;
+            if (!isEdit) {
+                response = await createUser(form.getFieldValue())
+            } else {
+                response = await updateUser(form.getFieldValue())
+            }
 
             if (response?.data?.code === 100200) {
-                // Show success notification
-                openNotificationWithIcon('success', 'Thành công', 'Thêm mới nhân viên thành công');
-
+                if (!isEdit) {
+                    // Show success notification
+                    openNotificationWithIcon('success', 'Thành công', 'Thêm mới nhân viên thành công');
+                } else {
+                    openNotificationWithIcon('success', 'Thành công', 'Cập nhật nhân viên thành công');
+                }
                 // Use a delayed navigation with state
                 setTimeout(() => {
                     navigate('/admin/staff', {state: {success: true}});
@@ -185,8 +182,8 @@ function RegisterForm() {
                             }
                             ]} required className={'w-full'} name={'fullname'}
                                        label={<><PersonIcon/>Họ và tên</>}>
-                                <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                       readOnly={isView}
+                                <Input disabled={isView} onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                       disabled={isView}
                                 />
                             </Form.Item>
                             <Form.Item required className={'w-full'} name={'username'}
@@ -199,7 +196,7 @@ function RegisterForm() {
                             }
                             ]} required className={'w-full'} name={'phone'}
                                        label={<><LocalPhoneIcon/>SĐT</>}>
-                                <Input readOnly={isView}/>
+                                <Input disabled={isView}/>
                             </Form.Item>
                             <Form.Item rules={[{
                                 required: true,
@@ -208,7 +205,7 @@ function RegisterForm() {
                             ]} required className={'w-full'} name={'password'}
                                        label={<><PersonIcon/>Mật khẩu</>}>
                                 <Input.Password
-                                    readOnly={isView}
+                                    disabled={isView}
                                     iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
                                 />
                             </Form.Item>
@@ -227,7 +224,6 @@ function RegisterForm() {
                                         // Can not select days before today and today
                                         return current && current > dayjs().endOf('day');
                                     }}
-                                    readOnly={isView}
                                     format={"DD/MM/YYYY"}
                                     placeholder="DD/MM/YYYY"
                                 />
@@ -240,7 +236,7 @@ function RegisterForm() {
                             ]} required className={'w-full'} name={'role'}
                                        label={<><PersonIcon/>Vai trò</>}>
                                 <Select allowClear={true}
-                                        readOnly={isView}
+                                        disabled={isView}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             const syntheticEvent = {
@@ -261,7 +257,7 @@ function RegisterForm() {
                                 message: 'Giới tính không được để trống'
                             }
                             ]} required={true} name={'gender'} label={<><Girl/> Giới tính</>}>
-                                <Radio.Group readOnly={isView}
+                                <Radio.Group disabled={isView}
                                              className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
                                              options={GENDER.map((item) => ({
                                                  value: item.id, label: item.name,
@@ -326,20 +322,20 @@ function RegisterForm() {
                                 <Form.Item required className={'w-full'} name={'fullname'}
                                            label={<><PersonIcon/>Họ và tên</>}>
                                     <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                           readOnly={isView}/>
+                                           disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'username'}
                                            label={<><BadgeIcon/>Username</>}>
-                                    <Input readOnly/>
+                                    <Input disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'phone'}
                                            label={<><LocalPhoneIcon/>SĐT</>}>
-                                    <Input readOnly={isView}/>
+                                    <Input disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'password'}
                                            label={<><HttpsIcon/>Mật khẩu</>}>
                                     <Input.Password
-                                        readOnly={isView}
+                                        disabled={isView}
                                         iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
                                     />
                                 </Form.Item>
@@ -349,21 +345,20 @@ function RegisterForm() {
                                     name={'dob'}
                                     label={<><CalendarViewDayIcon/>Ngày sinh</>}
                                 >
-                                    <DatePicker
-                                        disabledDate={(current) => {
-                                            // Can not select days before today and today
-                                            return current && current > dayjs().endOf('day');
-                                        }}
-                                        readOnly={isView}
-                                        format={"DD/MM/YYYY"}
-                                        placeholder="DD/MM/YYYY"
+                                    <DatePicker disabled={isView}
+                                                disabledDate={(current) => {
+                                                    // Can not select days before today and today
+                                                    return current && current > dayjs().endOf('day');
+                                                }}
+                                                format={"DD/MM/YYYY"}
+                                                placeholder="DD/MM/YYYY"
                                     />
                                 </Form.Item>
 
                                 <Form.Item required className={'w-full'} name={'roles'}
                                            label={<><GroupIcon/>Vai trò</>}>
                                     <Select
-                                        readOnly={isView}
+                                        disabled={isView}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             const syntheticEvent = {
@@ -380,7 +375,7 @@ function RegisterForm() {
                                     />
                                 </Form.Item>
                                 <Form.Item required={true} name={'gender'} label={<><Girl/> Giới tính</>}>
-                                    <Radio.Group readOnly={isView}
+                                    <Radio.Group disabled={isView}
                                                  className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
                                                  options={GENDER.map((item) => ({
                                                      value: item.id, label: item.name,
@@ -392,15 +387,16 @@ function RegisterForm() {
                                 <Form.Item required className={'w-full'} name={'cin'}
                                            label={<><CreditCardIcon/>CCCD</>}>
                                     <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                           readOnly={isView}/>
+                                           disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'cin'}
                                            label={<><SwitchAccountIcon/>MVN</>}>
-                                    <Input readOnly/>
+                                    <Input disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'province'}
                                            label={<><LocationOnIcon/>Tỉnh/TP</>}>
                                     <Select
+                                        disabled={isView}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             getListDistrict(selectedValues); // Call your existing handleChange
@@ -414,6 +410,7 @@ function RegisterForm() {
                                 <Form.Item required className={'w-full'} name={'district'}
                                            label={<><LocationOnIcon/>Quận/Huyện</>}>
                                     <Select
+                                        disabled={isView}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             getListWard(selectedValues); // Call your existing handleChange
@@ -426,6 +423,7 @@ function RegisterForm() {
                                 <Form.Item required className={'w-full'} name={'ward'}
                                            label={<><LocationOnIcon/>Phường/Xã</>}>
                                     <Select
+                                        disabled={isView}
                                         allowClear
                                         options={ward?.map((item) => ({
                                             value: item.code, label: item.name,
@@ -435,7 +433,7 @@ function RegisterForm() {
                                 <Form.Item required className={'w-full'} name={'active'}
                                            label={<><BoltIcon/>Hiệu lực</>}>
                                     <Select
-                                        readOnly={isView}
+                                        disabled={isView}
                                         onChange={(selectedValues) => {
                                             // Create a synthetic event to match the expected structure
                                             const syntheticEvent = {
@@ -452,19 +450,20 @@ function RegisterForm() {
                                     />
                                 </Form.Item>
                             </div>
+                            <div></div>
+                            {isEdit &&
+                                <div className={'flex justify-end'}>
+                                    <Button
+                                        htmlType={'submit'}
+                                        className={`bg-purple-500 py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                                        readOnly={isSubmitting}
+                                    >
+                                        {isSubmitting ? "Đang xử lý..." : !isEdit ? "Đăng ký" : "Cập nhật"}
+                                    </Button>
+                                </div>
+                            }
                         </div>
                     </Card>
-                    {/*{!isView && (<div className={'w-full flex justify-center'}>*/}
-                    {/*        <Button*/}
-                    {/*            htmlType={'submit'}*/}
-                    {/*            className={`w-2/3 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}*/}
-                    {/*            readOnly={isSubmitting}*/}
-                    {/*        >*/}
-                    {/*            {isSubmitting ? "Đang xử lý..." : !isEdit ? "Đăng ký" : "Cập nhật"}*/}
-                    {/*        </Button>*/}
-                    {/*    </div>*/}
-
-                    {/*)}*/}
                 </Form>
             </div>
 

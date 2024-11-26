@@ -1,10 +1,10 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import {
     Button, Card,
     DatePicker, Form,
-    Input,
+    Input, notification,
     Radio,
     Select,
 } from "antd";
@@ -14,11 +14,22 @@ import {
     findUserById,
 } from "../../../api/userAPIs.js";
 import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
-import {GENDER} from "../../../utils/const.js";
+import {ACTIVE, GENDER, ROLE} from "../../../utils/const.js";
 import Popup from "../../../components/Popup/PopUp.jsx";
 import PersonIcon from "@mui/icons-material/Person";
 import {Girl} from "@mui/icons-material";
 import moment from "moment";
+import LocalPhoneIcon from "@mui/icons-material/LocalPhone.js";
+import dayjs from "dayjs";
+import BadgeIcon from "@mui/icons-material/Badge.js";
+import HttpsIcon from "@mui/icons-material/Https.js";
+import CalendarViewDayIcon from "@mui/icons-material/CalendarViewDay.js";
+import GroupIcon from "@mui/icons-material/Group.js";
+import CreditCardIcon from "@mui/icons-material/CreditCard.js";
+import SwitchAccountIcon from "@mui/icons-material/SwitchAccount.js";
+import LocationOnIcon from "@mui/icons-material/LocationOn.js";
+import BoltIcon from "@mui/icons-material/Bolt.js";
+import {fetchDistricts, fetchProvinces, fetchWards} from "../../../api/locationAPIs.js";
 
 function RegisterFormCustomer() {
     const location = useLocation();
@@ -27,11 +38,16 @@ function RegisterFormCustomer() {
     const {id} = useParams(); // Access the id from the URL
     const navigate = useNavigate();
     const [form] = Form.useForm()
+    const [province, setProvinces] = useState([])// State để lưu trữ mã hồ sơ
+    const [district, setDistricts] = useState()// State để lưu trữ mã hồ sơ
+    const [ward, setWards] = useState()// State để lưu trữ mã hồ sơ
     const [popup, setPopUpProperties] = useState({
         message: null,
         onClose: null,
         type: null,
     });
+    const [api, contextHolder] = notification.useNotification();
+
     const [isPopupVisible, setPopupVisible] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [username, setUserName] = useState(''); // State để lưu trữ mã hồ sơ
@@ -72,6 +88,18 @@ function RegisterFormCustomer() {
             type: type,
         });
     }
+    const getListProvince = async () => {
+        const data = await fetchProvinces()
+        setProvinces(data)
+    }
+    const getListDistrict = async (id) => {
+        const data = await fetchDistricts(id)
+        setDistricts(data)
+    }
+    const getListWard = async (id) => {
+        const data = await fetchWards(id)
+        setWards(data)
+    }
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
@@ -100,68 +128,200 @@ function RegisterFormCustomer() {
             console.log(error);
         }
     };
-    return (
-        <>
-            {
-                !isView && !isEdit ? (
-                    <div className="w-full h-full bg-white grid grid-cols-2 items-center justify-center p-4 ">
-                        {isPopupVisible && (
-                            <Popup
-                                message={popup.message}
-                                onClose={popup.onClose}
-                                type={popup.type}
-                            />
-                        )}
-                        <Form initialValues={
-                            {
-                                fullname: null,
-                                username: null,
-                                phone: null,
-                                password: null,
-                                dob: null, // Convert to moment object
-                                gender: null
-                            }
-                        } onFinish={handleSubmit}
-                              size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
-                              labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
-                              wrapperCol={{span: 16}}>
-                            <Button
-                                type="link"
-                                className="!p-0 !m-0 flex items-center font-bold mb-4 !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
-                                onClick={() => navigate(-1)}>
-                                <KeyboardReturnIcon className="mr-2"/>
-                                {isView ? `Chi tiết tài khoản ${username}` : "Back"}
-                            </Button>
+    return (<>
+        {contextHolder}
+        {!isView && !isEdit ? (
+                <div className="w-full h-full bg-white grid grid-cols-2 items-center justify-center p-4 ">
+                    {isPopupVisible && (<Popup
+                        message={popup.message}
+                        onClose={popup.onClose}
+                        type={popup.type}
+                    />)}
+                    <Form initialValues={{
+                        fullname: null, username: null, phone: null, password: null, dob: null, // Convert to moment object
+                        role: null, gender: null
+                    }} onFinish={handleSubmit}
+                          size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
+                          labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
+                          wrapperCol={{span: 16}}>
+                        <Button
+                            type="link"
+                            className="!p-0 !m-0 flex items-center font-bold mb-4 !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
+                            onClick={() => navigate(-1)}>
+                            <KeyboardReturnIcon className="mr-2"/>
+                            {isView ? `Chi tiết tài khoản ${username}` : "Back"}
+                        </Button>
 
-                            <div className="w-full justify-center  flex items-center">
-                                <div className="w-3/4">
-                                    {
-                                        !isView && !isEdit ? (
-                                            <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-                                                Tạo tài khoản
-                                            </h2>
-                                        ) : ''
-                                    }
-                                </div>
+                        <div className="w-full justify-center  flex items-center">
+                            <div className="w-3/4">
+                                {!isView && !isEdit ? (
+                                    <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+                                        Tạo tài khoản
+                                    </h2>) : ''}
                             </div>
-                            <div className={'ml-12'}>
+                        </div>
+                        <div className={'ml-12'}>
+                            <Form.Item rules={[{
+                                required: true,
+                                message: 'Họ và tên không được để trống'
+                            }
+                            ]} required className={'w-full'} name={'fullname'}
+                                       label={<><PersonIcon/>Họ và tên</>}>
+                                <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                       disabled={isView}
+                                />
+                            </Form.Item>
+                            <Form.Item required className={'w-full'} name={'username'}
+                                       label={<><PersonIcon/>Username</>}>
+                                <Input readOnly/>
+                            </Form.Item>
+                            <Form.Item rules={[{
+                                required: true,
+                                message: 'SĐT không được để trống'
+                            }
+                            ]} required className={'w-full'} name={'phone'}
+                                       label={<><LocalPhoneIcon/>SĐT</>}>
+                                <Input disabled={isView}/>
+                            </Form.Item>
+                            <Form.Item rules={[{
+                                required: true,
+                                message: 'Mật khẩu không được để trống'
+                            }
+                            ]} required className={'w-full'} name={'password'}
+                                       label={<><PersonIcon/>Mật khẩu</>}>
+                                <Input.Password
+                                    disabled={isView}
+                                    iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                                />
+                            </Form.Item>
+                            <Form.Item rules={[{
+                                required: true,
+                                message: 'Ngày sinh không được để trống'
+                            }
+                            ]}
+                                       required
+                                       className={'w-full'}
+                                       name={'dob'}
+                                       label={<><PersonIcon/>Ngày sinh</>}
+                            >
+                                <DatePicker
+                                    disabledDate={(current) => {
+                                        // Can not select days before today and today
+                                        return current && current > dayjs().endOf('day');
+                                    }}
+                                    disabled={isView}
+                                    format={"DD/MM/YYYY"}
+                                    placeholder="DD/MM/YYYY"
+                                />
+                            </Form.Item>
+
+                            <Form.Item rules={[{
+                                required: true,
+                                message: 'Vai trò không được để trống'
+                            }
+                            ]} required className={'w-full'} name={'role'}
+                                       label={<><PersonIcon/>Vai trò</>}>
+                                <Select allowClear={true}
+                                        disabled={isView}
+                                        onChange={(selectedValues) => {
+                                            // Create a synthetic event to match the expected structure
+                                            const syntheticEvent = {
+                                                target: {
+                                                    name: "role", value: selectedValues, // Pass the selected values directly
+                                                },
+                                            };
+                                            handleChange(syntheticEvent); // Call your existing handleChange
+                                        }}
+                                        className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                        options={ROLE.map((item) => ({
+                                            value: item.id, label: item.name,
+                                        }))}
+                                />
+                            </Form.Item>
+                            <Form.Item rules={[{
+                                required: true,
+                                message: 'Giới tính không được để trống'
+                            }
+                            ]} required={true} name={'gender'} label={<><Girl/> Giới tính</>}>
+                                <Radio.Group disabled={isView}
+                                             className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                             options={GENDER.map((item) => ({
+                                                 value: item.id, label: item.name,
+                                             }))}>
+                                </Radio.Group>
+                            </Form.Item>
+                        </div>
+                        <div className={'w-full flex justify-center'}>
+                            <Button
+                                htmlType={'submit'}
+                                className={`w-2/3 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                                readOnly={isSubmitting}
+                            >
+                                {isSubmitting ? "Đang xử lý..." : !isEdit ? "Đăng ký" : "Cập nhật"}
+                            </Button>
+                        </div>
+                    </Form>
+                    <div className="flex justify-end">
+                        <img
+                            src="/assets/img/icon/creditimg.jpg"
+                            alt="Illustration"
+                            className="hidden md:block"
+                        />
+                    </div>
+                </div>) :
+            <div className="w-full h-full p-4 ">
+                {isPopupVisible && (<Popup
+                    message={popup.message}
+                    onClose={popup.onClose}
+                    type={popup.type}
+                />)}
+                <Form initialValues={{
+                    fullname: null,
+                    username: null,
+                    phone: null,
+                    password: null,
+                    dob: null, // Convert to moment object
+                    roles: null,
+                    gender: null
+                }} onFinish={handleSubmit}
+                      size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
+                      labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
+                      wrapperCol={{span: 16}}>
+                    <Button
+                        type="link"
+                        className="!p-0 !m-0 mt-5 flex items-center font-bold !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
+                        onClick={() => navigate(-1)}>
+                        <KeyboardReturnIcon className="mr-2"/>
+                        {isView ? `Chi tiết tài khoản ${username}` : "Back"}
+                    </Button>
+
+                    <div className="w-full justify-center mt-10 flex items-center">
+                        <div className="w-3/4">
+                            {!isView && !isEdit ? (<h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+                                Tạo tài khoản
+                            </h2>) : ''}
+                        </div>
+                    </div>
+                    <Card className={'p-[30px] w-full bg-[#f3f4f6]'}>
+                        <div className={'w-full grid grid-cols-2'}>
+                            <div>
                                 <Form.Item required className={'w-full'} name={'fullname'}
                                            label={<><PersonIcon/>Họ và tên</>}>
-                                    <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                           readOnly={isView}/>
+                                    <Input  onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                            disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'username'}
-                                           label={<><PersonIcon/>Username</>}>
-                                    <Input readOnly/>
+                                           label={<><BadgeIcon/>Username</>}>
+                                    <Input disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'phone'}
-                                           label={<><PersonIcon/>SĐT</>}>
-                                    <Input readOnly={isView}/>
+                                           label={<><LocalPhoneIcon/>SĐT</>}>
+                                    <Input disabled={isView}/>
                                 </Form.Item>
                                 <Form.Item required className={'w-full'} name={'password'}
-                                           label={<><PersonIcon/>Mật khẩu</>}>
+                                           label={<><HttpsIcon/>Mật khẩu</>}>
                                     <Input.Password
-                                        readOnly={isView}
+                                        disabled={isView}
                                         iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
                                     />
                                 </Form.Item>
@@ -169,18 +329,41 @@ function RegisterFormCustomer() {
                                     required
                                     className={'w-full'}
                                     name={'dob'}
-                                    label={<><PersonIcon/>Ngày sinh</>}
+                                    label={<><CalendarViewDayIcon/>Ngày sinh</>}
                                 >
                                     <DatePicker
-                                        readOnly={isView}
+                                        disabled={isView}
+                                        disabledDate={(current) => {
+                                            // Can not select days before today and today
+                                            return current && current > dayjs().endOf('day');
+                                        }}
+                                        disabled={isView}
                                         format={"DD/MM/YYYY"}
                                         placeholder="DD/MM/YYYY"
                                     />
                                 </Form.Item>
 
-
-                                <Form.Item name={'gender'} label={<><Girl/> Giới tính</>}>
-                                    <Radio.Group readOnly={isView}
+                                <Form.Item required className={'w-full'} name={'roles'}
+                                           label={<><GroupIcon/>Vai trò</>}>
+                                    <Select
+                                        disabled={isView}
+                                        onChange={(selectedValues) => {
+                                            // Create a synthetic event to match the expected structure
+                                            const syntheticEvent = {
+                                                target: {
+                                                    name: "role", value: selectedValues, // Pass the selected values directly
+                                                },
+                                            };
+                                            handleChange(syntheticEvent); // Call your existing handleChange
+                                        }}
+                                        className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                        options={ROLE.map((item) => ({
+                                            value: item.id, label: item.name,
+                                        }))}
+                                    />
+                                </Form.Item>
+                                <Form.Item required={true} name={'gender'} label={<><Girl/> Giới tính</>}>
+                                    <Radio.Group disabled={isView}
                                                  className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
                                                  options={GENDER.map((item) => ({
                                                      value: item.id, label: item.name,
@@ -188,186 +371,95 @@ function RegisterFormCustomer() {
                                     </Radio.Group>
                                 </Form.Item>
                             </div>
-                            {!isView && (
-                                <div className={'w-full flex justify-center'}>
+                            <div>
+                                <Form.Item required className={'w-full'} name={'cin'}
+                                           label={<><CreditCardIcon/>CCCD</>}>
+                                    <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
+                                           disabled={isView}/>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'cin'}
+                                           label={<><SwitchAccountIcon/>MVN</>}>
+                                    <Input disabled={isView}/>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'province'}
+                                           label={<><LocationOnIcon/>Tỉnh/TP</>}>
+                                    <Select
+                                        disabled={isView}
+                                        onChange={(selectedValues) => {
+                                            // Create a synthetic event to match the expected structure
+                                            getListDistrict(selectedValues); // Call your existing handleChange
+                                        }} allowClear
+                                        options={province?.map((item) => ({
+                                            value: item.code, label: item.name,
+                                        }))}
+                                    >
+                                    </Select>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'district'}
+                                           label={<><LocationOnIcon/>Quận/Huyện</>}>
+                                    <Select
+                                        disabled={isView}
+                                        onChange={(selectedValues) => {
+                                            // Create a synthetic event to match the expected structure
+                                            getListWard(selectedValues); // Call your existing handleChange
+                                        }} allowClear
+                                        options={district?.map((item) => ({
+                                            value: item.code, label: item.name,
+                                        }))}
+                                    > </Select>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'ward'}
+                                           label={<><LocationOnIcon/>Phường/Xã</>}>
+                                    <Select
+                                        disabled={isView}
+                                        allowClear
+                                        options={ward?.map((item) => ({
+                                            value: item.code, label: item.name,
+                                        }))}
+                                    > </Select>
+                                </Form.Item>
+                                <Form.Item required className={'w-full'} name={'active'}
+                                           label={<><BoltIcon/>Hiệu lực</>}>
+                                    <Select
+                                        disabled={isView}
+                                        onChange={(selectedValues) => {
+                                            // Create a synthetic event to match the expected structure
+                                            const syntheticEvent = {
+                                                target: {
+                                                    name: "role", value: selectedValues, // Pass the selected values directly
+                                                },
+                                            };
+                                            handleChange(syntheticEvent); // Call your existing handleChange
+                                        }}
+                                        className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
+                                        options={ACTIVE.map((item) => ({
+                                            value: item.id, label: item.name,
+                                        }))}
+                                    />
+                                </Form.Item>
+                            </div>
+                            <div>
+
+                            </div>
+                            {isEdit &&
+                                <div className={'flex justify-end'}>
                                     <Button
                                         htmlType={'submit'}
-                                        className={`w-2/3 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${
-                                            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                                        }`}
+                                        className={`bg-purple-500 py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                                         readOnly={isSubmitting}
                                     >
-                                        {isSubmitting
-                                            ? "Đang xử lý..."
-                                            : !isEdit
-                                                ? "Đăng ký"
-                                                : "Cập nhật"}
+                                        {isSubmitting ? "Đang xử lý..." : !isEdit ? "Đăng ký" : "Cập nhật"}
                                     </Button>
                                 </div>
-
-                            )}
-                        </Form>
-                        <div className="flex justify-end">
-                            <img
-                                src="/assets/img/icon/creditimg.jpg"
-                                alt="Illustration"
-                                className="hidden md:block"
-                            />
+                            }
                         </div>
-                    </div>
-                ) : <div className="w-full h-full p-4 ">
-                    {isPopupVisible && (
-                        <Popup
-                            message={popup.message}
-                            onClose={popup.onClose}
-                            type={popup.type}
-                        />
-                    )}
-                    <Form initialValues={
-                        {
-                            fullname: null,
-                            username: null,
-                            phone: null,
-                            password: null,
-                            dob: null, // Convert to moment object
-                            gender: null,
-                            placeOfIssue:null,
-                            issueDate:null,
-                        }
-                    } onFinish={handleSubmit}
-                          size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
-                          labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
-                          wrapperCol={{span: 16}}>
-                        <Button
-                            type="link"
-                            className="!p-0 !m-0 mt-5 flex items-center font-bold !text-black hover:!text-[#CED0F8] transition-colors text-3xl"
-                            onClick={() => navigate(-1)}>
-                            <KeyboardReturnIcon className="mr-2"/>
-                            {isView ? `Chi tiết tài khoản ${username}` : "Back"}
-                        </Button>
+                    </Card>
+                </Form>
+            </div>
 
-                        <div className="w-full justify-center mt-10 flex items-center">
-                            <div className="w-3/4">
-                                {
-                                    !isView && !isEdit ? (
-                                        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-                                            Tạo tài khoản
-                                        </h2>
-                                    ) : ''
-                                }
-                            </div>
-                        </div>
-                        <Card className={'p-[30px] w-full bg-[#f3f4f6]'}>
-                            <div className={'w-full grid grid-cols-2'}>
-                                <div>
-                                    <Form.Item required className={'w-full'} name={'fullname'}
-                                               label={<><PersonIcon/>Họ và tên</>}>
-                                        <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                               readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'username'}
-                                               label={<><PersonIcon/>Username</>}>
-                                        <Input readOnly/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'phone'}
-                                               label={<><PersonIcon/>SĐT</>}>
-                                        <Input readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'password'}
-                                               label={<><PersonIcon/>Mật khẩu</>}>
-                                        <Input.Password
-                                            readOnly={isView}
-                                            iconRender={(visible) => (visible ? <EyeTwoTone/> :
-                                                <EyeInvisibleOutlined/>)}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item
-                                        required
-                                        className={'w-full'}
-                                        name={'dob'}
-                                        label={<><PersonIcon/>Ngày sinh</>}
-                                    >
-                                        <DatePicker
-                                            readOnly={isView}
-                                            format={"DD/MM/YYYY"}
-                                            placeholder="DD/MM/YYYY"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'phone'}
-                                               label={<><PersonIcon/>Hiệu lực</>}>
-                                        <Select readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item name={'gender'} label={<><Girl/> Giới tính</>}>
-                                        <Radio.Group readOnly={isView}
-                                                     className="w-full border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 m-0"
-                                                     options={GENDER.map((item) => ({
-                                                         value: item.id, label: item.name,
-                                                     }))}>
-                                        </Radio.Group>
-                                    </Form.Item>
-                                </div>
-                                <div>
-                                    <Form.Item required className={'w-full'} name={'CCCD'}
-                                               label={<><PersonIcon/>CCCD</>}>
-                                        <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                               readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'MVN'}
-                                               label={<><PersonIcon/>MVN</>}>
-                                        <Input readOnly/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'Tỉnh/TP'}
-                                               label={<><PersonIcon/>Tỉnh/TP</>}>
-                                        <Input readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'password'}
-                                               label={<><PersonIcon/>Quận/Huyện</>}>
-                                        <Input readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'password'}
-                                               label={<><PersonIcon/>Phường/Xã</>}>
-                                        <Input readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'password'}
-                                               label={<><PersonIcon/>Nợi cấp</>}>
-                                        <Input readOnly={isView}/>
-                                    </Form.Item>
-                                    <Form.Item required className={'w-full'} name={'password'}
-                                               label={<><PersonIcon/>Ngày cấp</>}>
-                                        <DatePicker
-                                            readOnly={isView}
-                                            format={"DD/MM/YYYY"}
-                                            placeholder="DD/MM/YYYY"
-                                        />
-                                    </Form.Item>
+        }
+    </>);
 
-                                </div>
-                            </div>
-                        </Card>
-                        {!isView && (
-                            <div className={'w-full flex justify-center'}>
-                                <Button
-                                    htmlType={'submit'}
-                                    className={`w-2/3 bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 mt-6 ${
-                                        isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                                    }`}
-                                    readOnly={isSubmitting}
-                                >
-                                    {isSubmitting
-                                        ? "Đang xử lý..."
-                                        : !isEdit
-                                            ? "Đăng ký"
-                                            : "Cập nhật"}
-                                </Button>
-                            </div>
-
-                        )}
-                    </Form>
-                </div>
-
-            }
-        </>
-    );
 }
 
 export default RegisterFormCustomer;

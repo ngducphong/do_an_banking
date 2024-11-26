@@ -64,6 +64,14 @@ export const createUser = async (form) => {
         notify("error", "Có lỗi xảy ra");
     }
 }
+export const updateUser = async (form) => {
+    try {
+        return await jsonAxios.put(`/users/update-user-staff/${form.id}`, form);
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
 export const createUserName = async (fullname) => {
     try {
         const encodedFullname = encodeURIComponent(fullname);

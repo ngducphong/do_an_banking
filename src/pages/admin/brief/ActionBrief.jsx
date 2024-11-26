@@ -351,11 +351,8 @@ const ActionBrief = () => {
                             <Form.Item name={'phuongthuctinhlai'} label={<><TrendingUp/>Phương thức tính lãi</>}>
                                 <Input readOnly/>
                             </Form.Item>
-                            <Form.Item name={'ngaysinh'} label={<><ViewDay/>Ngày sinh</>}>
-                                <DatePicker
-                                    disabled
-                                    format={"DD/MM/YYYY"}
-                                    placeholder="DD/MM/YYYY"/>
+                            <Form.Item name={'ngaysinh'} label={<><ViewDay/>Trả mỗi tháng</>}>
+                                <Button type="primary">Xem</Button>
                             </Form.Item>
                             <Form.Item name={'laisuat'} label={<><CreditCard/>Lãi suất</>}>
                                 <InputNumber
