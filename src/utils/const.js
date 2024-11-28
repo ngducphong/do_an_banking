@@ -54,6 +54,7 @@ export const STATUSES = [
     {code: 'WAITING_FOR_APPROVAL', label: "Chờ phê duyệt", color: "bg-green-400"},
     {code: 'APPROVING', label: "Đang phê duyệt", color: "bg-emerald-500"},
     {code: 'WAITING_FOR_DISBURSEMENT', label: "Chờ giải ngân", color: "bg-yellow-500"},
+    { code: 'DISBURSED', label: 'Đã giải ngân', color: "bg-yellow-700" },
     {code: 'REJECTED_CHECK_HS', label: "Đã từ chối", color: "bg-rose-400"},
 ];
 export const PERMISSIONS = [
