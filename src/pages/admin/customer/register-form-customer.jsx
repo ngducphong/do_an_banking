@@ -386,7 +386,7 @@ function RegisterFormCustomer() {
                                     <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
                                            disabled={isView || isEdit}/>
                                 </Form.Item>
-                                <Form.Item required className={'w-full'} name={'cin'}
+                                <Form.Item required className={'w-full'} name={'code'}
                                            label={<><SwitchAccountIcon/>MVN</>}>
                                     <Input disabled={isView || isEdit}/>
                                 </Form.Item>

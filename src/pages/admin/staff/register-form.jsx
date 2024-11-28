@@ -389,7 +389,7 @@ function RegisterForm() {
                                     <Input onBlur={() => generateUserName(form.getFieldValue('fullname'))}
                                            disabled={isView}/>
                                 </Form.Item>
-                                <Form.Item required className={'w-full'} name={'cin'}
+                                <Form.Item required className={'w-full'} name={'code'}
                                            label={<><SwitchAccountIcon/>MVN</>}>
                                     <Input disabled={isView}/>
                                 </Form.Item>
