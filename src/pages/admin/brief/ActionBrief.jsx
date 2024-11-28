@@ -111,8 +111,8 @@ const ActionBrief = () => {
     const actionLoan = async (loanId) => {
         try {
             let response
-            console.log(user)
-            if (permissions.includes(trangthai)) {
+            const isAdmin = user.roles[0] === "ADMIN";
+            if (isAdmin || permissions.includes(trangthai)) {
                 switch (trangthai) {
                     case STATUSES[0].code:
                         response = await receiveLoan(loanId);
@@ -141,6 +141,7 @@ const ActionBrief = () => {
             } else {
                 openNotification("Bạn không có quyền thực hiện thao tác này");
             }
+
             const data = response?.data?.result;
 
             if (data) {
