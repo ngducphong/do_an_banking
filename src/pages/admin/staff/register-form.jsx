@@ -45,7 +45,6 @@ function RegisterForm() {
 
     useEffect(() => {
         fetchUserData();
-        getListProvince()// Call the async function immediately
     }, [form, id]);
     const openNotificationWithIcon = (type, message, description) => {
         api[type]({
@@ -69,6 +68,9 @@ function RegisterForm() {
                             form.setFieldValue(key, value);
                         }
                     })
+                    getListProvince()// Call the async function immediately
+                    getListDistrict()// Call the async function immediately
+                    getListWard()// Call the async function immediately
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -79,12 +81,12 @@ function RegisterForm() {
         const data = await fetchProvinces()
         setProvinces(data)
     }
-    const getListDistrict = async (id) => {
-        const data = await fetchDistricts(id)
+    const getListDistrict = async () => {
+        const data = await fetchDistricts(form.getFieldValue('province'))
         setDistricts(data)
     }
-    const getListWard = async (id) => {
-        const data = await fetchWards(id)
+    const getListWard = async () => {
+        const data = await fetchWards(form.getFieldValue('district'))
         setWards(data)
     }
 
@@ -153,8 +155,16 @@ function RegisterForm() {
                         type={popup.type}
                     />)}
                     <Form initialValues={{
-                        fullname: null, username: null, phone: null, password: null, dob: null, // Convert to moment object
-                        role: null, gender: null
+                        fullname: null,
+                        username: null,
+                        phone: null,
+                        password: null,
+                        dob: null, // Convert to moment object
+                        roles: null,
+                        gender: null,
+                        province: null,
+                        district: null,
+                        ward: null
                     }} onFinish={handleSubmit}
                           size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
                           labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
@@ -183,7 +193,6 @@ function RegisterForm() {
                             ]} required className={'w-full'} name={'fullname'}
                                        label={<><PersonIcon/>Họ và tên</>}>
                                 <Input disabled={isView} onBlur={() => generateUserName(form.getFieldValue('fullname'))}
-                                       disabled={isView}
                                 />
                             </Form.Item>
                             <Form.Item required className={'w-full'} name={'username'}
@@ -296,7 +305,10 @@ function RegisterForm() {
                     password: null,
                     dob: null, // Convert to moment object
                     roles: null,
-                    gender: null
+                    gender: null,
+                    province: null,
+                    district: null,
+                    ward: null
                 }} onFinish={handleSubmit}
                       size={'large'} className={' bg-white w-full m-0 p-0 h-full !block'} form={form}
                       labelWrap={true} colon={false} labelAlign={'left'} labelCol={{span: 6}}
@@ -308,7 +320,6 @@ function RegisterForm() {
                         <KeyboardReturnIcon className="mr-2"/>
                         {isView ? `Chi tiết tài khoản ${username}` : "Back"}
                     </Button>
-
                     <div className="w-full justify-center mt-10 flex items-center">
                         <div className="w-3/4">
                             {!isView && !isEdit ? (<h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
@@ -393,28 +404,29 @@ function RegisterForm() {
                                            label={<><SwitchAccountIcon/>MVN</>}>
                                     <Input disabled={isView}/>
                                 </Form.Item>
-                                <Form.Item required className={'w-full'} name={'province'}
-                                           label={<><LocationOnIcon/>Tỉnh/TP</>}>
+                                <Form.Item
+                                    required
+                                    className={'w-full'}
+                                    name={'province'}
+                                    label={<><LocationOnIcon />Tỉnh/TP</>}
+                                >
                                     <Select
                                         disabled={isView}
-                                        onChange={(selectedValues) => {
-                                            // Create a synthetic event to match the expected structure
-                                            getListDistrict(selectedValues); // Call your existing handleChange
-                                        }} allowClear
+                                        onChange={getListDistrict}
+                                        allowClear
                                         options={province?.map((item) => ({
-                                            value: item.code, label: item.name,
+                                            value: item.code,
+                                            label: item.name,
                                         }))}
                                     >
                                     </Select>
                                 </Form.Item>
+
                                 <Form.Item required className={'w-full'} name={'district'}
                                            label={<><LocationOnIcon/>Quận/Huyện</>}>
                                     <Select
                                         disabled={isView}
-                                        onChange={(selectedValues) => {
-                                            // Create a synthetic event to match the expected structure
-                                            getListWard(selectedValues); // Call your existing handleChange
-                                        }} allowClear
+                                        onChange={getListWard} allowClear
                                         options={district?.map((item) => ({
                                             value: item.code, label: item.name,
                                         }))}

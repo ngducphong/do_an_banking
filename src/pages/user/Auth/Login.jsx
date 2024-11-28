@@ -25,19 +25,22 @@ export default function Login() {
     try {
       const response = await loginApi({ username, password });
       localStorage.setItem("user",JSON.stringify(response?.data?.result))
-      const { token: accessToken, expiryTime, roles, type, username: fullName } = response?.data?.result;
-      localStorage.setItem("roles", JSON.stringify(roles));
-      // Lưu accessToken vào cookies
-      Cookies.set("accessToken", accessToken, {
-        expires: expiryTime / (24 * 60 * 60 * 1000),
-        secure: true,
-      });
+      if(response?.data?.result.roles[0] !== "USER"){
+        const { token: accessToken, expiryTime, roles, type, username: fullName } = response?.data?.result;
+        localStorage.setItem("roles", JSON.stringify(roles));
+        // Lưu accessToken vào cookies
+        Cookies.set("accessToken", accessToken, {
+          expires: expiryTime / (24 * 60 * 60 * 1000),
+          secure: true,
+        });
 
-      console.log("check : ");
-      notify("success", "Đăng nhập thành công");
-      //  // Xử lý chuyển hướng nếu cần
-      window.location.href = "/admin";
-
+        console.log("check : ");
+        notify("success", "Đăng nhập thành công");
+        //  // Xử lý chuyển hướng nếu cần
+        window.location.href = "/admin";
+      }else {
+        notify("error", "Tài khoản của bạn không có quyền");
+      }
     } catch (error) {
       console.log(error);
       notify("error", error.response.data || "Có lỗi xảy ra khi đăng nhập");

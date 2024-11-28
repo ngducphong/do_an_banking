@@ -166,7 +166,7 @@ const ListCustomer = () => {
                     }}
                 /> </Space>
             <div className="mb-3 font-bold grid grid-cols-2 items-center">
-                <div className="text-2xl ml-3">Tất cả tài khoản nhân viên</div>
+                <div className="text-2xl ml-3">Tất cả tài khoản khách hàng</div>
                 <div className="text-end">
                     Tổng kết quả: {totalResults}
                 </div>
