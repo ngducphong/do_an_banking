@@ -55,6 +55,7 @@ function RegisterForm() {
     const fetchUserData = async () => {
         if (id) {
             try {
+                await getListProvince()// Call the async function immediately
                 const response = await findUserById(id);
                 if (response?.data?.result) {
                     setUserName(response?.data?.result?.username)
@@ -65,10 +66,13 @@ function RegisterForm() {
                         } else if (['roles'].includes(key) && value) {
                             form.setFieldValue(key, value[0]);
                         } else {
-                            form.setFieldValue(key, value);
+                            if(key === 'province' || key === 'district' || key === 'ward' ){
+                                form.setFieldValue(key, Number(value));
+                            }else {
+                                form.setFieldValue(key, value);
+                            }
                         }
                     })
-                    getListProvince()// Call the async function immediately
                     getListDistrict()// Call the async function immediately
                     getListWard()// Call the async function immediately
                 }
