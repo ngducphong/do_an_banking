@@ -85,6 +85,19 @@ const ActionBrief = () => {
             console.error('Failed to fetch loan data:', error);
         }
     }, [id, loan]);
+    const handleDownload = (e, url) => {
+        const fileExtension = url.split(".").pop().toLowerCase(); // Lấy đuôi file
+
+        if (fileExtension === "doc" || fileExtension === "docx") {
+            // Nếu đuôi là .doc hoặc .docx, tải file xuống
+            console.log("Downloading file...");
+        } else {
+            // Nếu không phải .doc/.docx, cho phép mở file mặc định
+            console.log("Opening file in a new tab...");
+            e.preventDefault();
+            window.open(url, "_blank");
+        }
+    };
     const getPermissions = async () => {
         const response = await getPermission(user.roles[0])
         setPermissions(response.data?.map(permissions => permissions.code))
@@ -176,6 +189,7 @@ const ActionBrief = () => {
     const rejectCheckLoan = async (id, reason) => {
         const response = await rejectedCheckHs(id, reason)
         if (response && response.data) {
+            setIsModalRefuseOpen(false) // Đóng modal
             fetchData(); // Update form after loan is received
         }
     }
@@ -445,11 +459,17 @@ const ActionBrief = () => {
                                 className="hover:cursor-pointer"
                                 label={
                                     <>
-                                        <ArticleIcon /> Giấy tờ đi kèm
+                                        <ArticleIcon/> Giấy tờ đi kèm
                                     </>
                                 }
                             >
-                                <OpenInBrowser href={loan.getFieldValue('link')} className="ml-3" />
+                                <a
+                                    href={"https://res.cloudinary.com/dzuahpxqv/raw/upload/v1732214365/dgkfarsbtpxsgjnxcdcs.docx"}
+                                    onClick={(e) => handleDownload(e,     "https://res.cloudinary.com/dzuahpxqv/raw/upload/v1732214365/dgkfarsbtpxsgjnxcdcs.docx")}
+                                    download
+                                >
+                                    <OpenInBrowser className="ml-3"/>
+                                </a>
                             </Form.Item>
                         </div>
 
