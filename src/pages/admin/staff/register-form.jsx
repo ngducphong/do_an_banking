@@ -23,7 +23,6 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import {fetchDistricts, fetchProvinces, fetchWards} from "../../../api/locationAPIs.js";
-import dayjs from "dayjs";
 
 function RegisterForm() {
     const location = useLocation();
