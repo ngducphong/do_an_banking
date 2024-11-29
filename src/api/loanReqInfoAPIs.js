@@ -133,6 +133,16 @@ export const disbursedLoanReqInfo = async (id) => {
         notify("error", "Có lỗi xảy ra");
     }
 }
+export const exportToExcel = async (id) => {
+    try {
+        return  await jsonAxios.get(`/loan-info/export-to-excel/${id}`, {
+            responseType: 'blob', // Đặt kiểu phản hồi là blob
+        });
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
 export const rejectedCheckHs = async (id, reason) => {
     try {
         return await jsonAxios.put(`/loan-info/rejected-check-hs/${id}`, {reason});

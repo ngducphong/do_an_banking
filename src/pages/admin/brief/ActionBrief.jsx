@@ -4,7 +4,7 @@ import {GENDER, PERMISSIONS, STATUSES} from "../../../utils/const.js";
 import ArticleIcon from '@mui/icons-material/Article';
 import PersonIcon from "@mui/icons-material/Person";
 import {
-    AccessAlarm, CalendarMonth, CreditCard, Girl, OpenInBrowser, Phone, TrendingUp, ViewDay
+    AccessAlarm, CalendarMonth, CreditCard, Girl, OpenInBrowser, Phone, SystemUpdateAlt, TrendingUp, ViewDay
 } from "@mui/icons-material";
 import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import React, {useCallback, useEffect, useState} from "react";
@@ -12,7 +12,7 @@ import {useParams} from "react-router-dom";
 import {
     approvingLoanReqInfo, calculatorLoanPerMonth,
     checkingCicLoanReqInfo,
-    checkingLoanReqInfo, disbursedLoanReqInfo, evaluatingLoanReqInfo, finalEvaluationLoanReqInfo,
+    checkingLoanReqInfo, disbursedLoanReqInfo, evaluatingLoanReqInfo, exportToExcel, finalEvaluationLoanReqInfo,
     getLoan,
     receiveLoan, rejectedCheckHs, waitingForApprovalLoanReqInfo,
     waitingForCheckLoanReqInfo,
@@ -85,19 +85,22 @@ const ActionBrief = () => {
             console.error('Failed to fetch loan data:', error);
         }
     }, [id, loan]);
-    const handleDownload = (e, url) => {
-        const fileExtension = url.split(".").pop().toLowerCase(); // Lấy đuôi file
+    const exportExcel = async ()=>{
+        const response  = await exportToExcel(id)
+        // Tạo URL cho blob
+        const url = window.URL.createObjectURL(new Blob([response.data]));
 
-        if (fileExtension === "doc" || fileExtension === "docx") {
-            // Nếu đuôi là .doc hoặc .docx, tải file xuống
-            console.log("Downloading file...");
-        } else {
-            // Nếu không phải .doc/.docx, cho phép mở file mặc định
-            console.log("Opening file in a new tab...");
-            e.preventDefault();
-            window.open(url, "_blank");
-        }
-    };
+        // Tạo một thẻ <a> để tải file
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `loan_info_${id}.xlsx`); // Tên file tải về
+        document.body.appendChild(link);
+        link.click(); // Simulate click to download
+        link.remove(); // Xóa thẻ <a> khỏi DOM
+
+        // Giải phóng URL
+        window.URL.revokeObjectURL(url);
+    }
     const getPermissions = async () => {
         const response = await getPermission(user.roles[0])
         setPermissions(response.data?.map(permissions => permissions.code))
@@ -445,7 +448,10 @@ const ActionBrief = () => {
                                 <Input readOnly/>
                             </Form.Item>
                             <Form.Item name={'tramoithang'} label={<><ViewDay/>Trả mỗi tháng</>}>
-                                <Input readOnly/>
+                                <InputNumber readOnly suffix={'VND'}
+                                             min={0}
+                                             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                             parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}/>
                             </Form.Item>
                             <Form.Item name={'laisuat'} label={<><CreditCard/>Lãi suất</>}>
                                 <InputNumber
@@ -464,11 +470,9 @@ const ActionBrief = () => {
                                 }
                             >
                                 <a
-                                    href={"https://res.cloudinary.com/dzuahpxqv/raw/upload/v1732214365/dgkfarsbtpxsgjnxcdcs.docx"}
-                                    onClick={(e) => handleDownload(e,     "https://res.cloudinary.com/dzuahpxqv/raw/upload/v1732214365/dgkfarsbtpxsgjnxcdcs.docx")}
-                                    download
+                                    onClick={exportExcel}
                                 >
-                                    <OpenInBrowser className="ml-3"/>
+                                    <SystemUpdateAlt className="ml-3"/>
                                 </a>
                             </Form.Item>
                         </div>
