@@ -163,7 +163,7 @@ const ListBrief = () => {
                     className="w-full h-full shadow-2xl bg-white rounded overflow-hidden"
                     columns={columns}
                     dataSource={data} // Use fetched data here
-                    pagination={true}
+                    pagination={false}
                     bordered
                     onRow={(record) => {
                         return {
