@@ -441,8 +441,15 @@ const ActionBrief = () => {
                                     parser={(value) => value?.replace('%', '')}
                                 />
                             </Form.Item>
-                            <Form.Item label={<><ArticleIcon/>Giấy tờ đi kèm</>}>
-                                <OpenInBrowser href={loan.getFieldValue('link')} className={'ml-3'}/>
+                            <Form.Item
+                                className="hover:cursor-pointer"
+                                label={
+                                    <>
+                                        <ArticleIcon /> Giấy tờ đi kèm
+                                    </>
+                                }
+                            >
+                                <OpenInBrowser href={loan.getFieldValue('link')} className="ml-3" />
                             </Form.Item>
                         </div>
 
