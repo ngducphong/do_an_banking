@@ -55,7 +55,6 @@ function RegisterForm() {
     const fetchUserData = async () => {
         if (id) {
             try {
-                await getListProvince()// Call the async function immediately
                 const response = await findUserById(id);
                 if (response?.data?.result) {
                     setUserName(response?.data?.result?.username)
@@ -73,8 +72,9 @@ function RegisterForm() {
                             }
                         }
                     })
-                    getListDistrict()// Call the async function immediately
-                    getListWard()// Call the async function immediately
+                    await getListProvince()// Call the async function immediately
+                    await getListDistrict()// Call the async function immediately
+                    await getListWard()// Call the async function immediately
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);

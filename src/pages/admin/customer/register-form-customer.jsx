@@ -62,11 +62,23 @@ function RegisterFormCustomer() {
                             if (['dob'].includes(key) && value) {
                                 // Chuyển đổi giá trị ngày sang moment nếu key là ngày
                                 form.setFieldValue(key, moment(value));
+                            } else if (['roles'].includes(key) && value) {
+                                form.setFieldValue(key, value[0]);
                             } else {
-                                form.setFieldValue(key, value);
+                                if(key === 'province' || key === 'district' || key === 'ward' ){
+                                    form.setFieldValue(key, Number(value));
+                                }else {
+                                    form.setFieldValue(key, value);
+                                }
                             }
                         })
                     }
+                    if(form.getFieldValue('province'))
+                     getListProvince(form.getFieldValue('province'))
+                    if(form.getFieldValue('district'))
+                     getListDistrict(form.getFieldValue('district'))
+                    if(form.getFieldValue('ward'))
+                        getListWard(form.getFieldValue('ward'))
                 } catch (error) {
                     console.error("Error fetching user data:", error);
                 }
