@@ -11,7 +11,7 @@ import {
 import {
     createUser,
     createUserName,
-    findUserById,
+    findUserById, updateUser,
 } from "../../../api/userAPIs.js";
 import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 import {ACTIVE, GENDER, ROLE} from "../../../utils/const.js";
@@ -117,10 +117,10 @@ function RegisterFormCustomer() {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const response = await createUser(form.getFieldValue());
+            const response = await updateUser(form.getFieldValue());
             if (response?.data?.code === 100200) {
                 setPopupVisible(true);
-                setPopUpP("Bạn đã tạo tài khoản thành công", closePopUp, "success")
+                setPopUpP("Cập nhật thông tin khách hàng thành công", closePopUp, "success")
             }
             console.log(response);
         } catch (error) {
