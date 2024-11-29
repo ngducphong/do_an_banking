@@ -10,7 +10,7 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {
-    approvingLoanReqInfo,
+    approvingLoanReqInfo, calculatorLoanPerMonth,
     checkingCicLoanReqInfo,
     checkingLoanReqInfo, disbursedLoanReqInfo, evaluatingLoanReqInfo, finalEvaluationLoanReqInfo,
     getLoan,
@@ -55,7 +55,7 @@ const ActionBrief = () => {
         try {
             const response = await getLoan(id);
             const data = response?.data?.result;
-
+            const tramoithang = await calculatorLoanPerMonth(data.userId,data.loanProductId,data.loanTermId,data.interestRateTypeId,data.sotienvay)
             if (data) {
                 loan.setFieldsValue({
                     id: data.id,
@@ -71,7 +71,7 @@ const ActionBrief = () => {
                     kyhan: data.kyhan,
                     ngayvay: data.ngayvay ? moment(data.ngayvay) : null,
                     phuongthuctinhlai: data.phuongthuctinhlai,
-                    tramoithang: data.tramoithang,
+                    tramoithang: tramoithang?.data?.result?.paymentSchedules[0]?.amount,
                     laisuat: data.laisuat,
                 });
                 setTrangthai(data.trangthai);
@@ -430,8 +430,8 @@ const ActionBrief = () => {
                             <Form.Item name={'phuongthuctinhlai'} label={<><TrendingUp/>Phương thức tính lãi</>}>
                                 <Input readOnly/>
                             </Form.Item>
-                            <Form.Item name={'ngaysinh'} label={<><ViewDay/>Trả mỗi tháng</>}>
-                                <Button type="primary">Xem</Button>
+                            <Form.Item name={'tramoithang'} label={<><ViewDay/>Trả mỗi tháng</>}>
+                                <Input readOnly/>
                             </Form.Item>
                             <Form.Item name={'laisuat'} label={<><CreditCard/>Lãi suất</>}>
                                 <InputNumber
@@ -442,8 +442,7 @@ const ActionBrief = () => {
                                 />
                             </Form.Item>
                             <Form.Item label={<><ArticleIcon/>Giấy tờ đi kèm</>}>
-                                <OpenInBrowser className={'ml-3'}/>
-                                <SaveAltIcon className={'ml-3'}/>
+                                <OpenInBrowser href={loan.getFieldValue('link')} className={'ml-3'}/>
                             </Form.Item>
                         </div>
 

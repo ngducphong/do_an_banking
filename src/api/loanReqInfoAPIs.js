@@ -150,3 +150,11 @@ export const countWaitingForReceipt = async () => {
         notify("error", "Có lỗi xảy ra");
     }
 }
+export const calculatorLoanPerMonth = async (userId,loanProductId,loanTermId,interestRateTypeId,amount) => {
+    try {
+        return await jsonAxios.post(`/calculator/per-month`,{userId,loanProductId,interestRateTypeId,loanTermId,amount});
+    } catch (error) {
+        console.log(error);
+        notify("error", "Có lỗi xảy ra");
+    }
+}
