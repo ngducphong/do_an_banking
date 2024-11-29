@@ -88,7 +88,7 @@ function RegisterFormCustomer() {
     }, [form, id]); // Add dependencies to the effect
     useEffect(() => {
         getListProvince()// Call the async function immediately
-    })
+    },[])
     const closePopUp = () => {
         setPopupVisible(false);
         if (popup.type === 'success') {
