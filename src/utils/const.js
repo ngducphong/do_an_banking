@@ -50,11 +50,11 @@ export const STATUSES = [
     {code: 'WAITING_FOR_EVALUATION', label: "Chờ thẩm định ĐT", color: "bg-orange-400"},
     {code: 'EVALUATING', label: "Đang thẩm định ĐT", color: "bg-amber-500"},
     {code: 'WAITING_FOR_FINAL_EVALUATION', label: "Chờ thẩm định ĐB", color: "bg-yellow-300"},
-    {code: 'FINAL_EVALUATING', label: "Đang thẩm định ĐB", color: "bg-lime-500"},
+    {code: 'FINAL_EVALUATION', label: "Đang thẩm định ĐB", color: "bg-lime-500"},
     {code: 'WAITING_FOR_APPROVAL', label: "Chờ phê duyệt", color: "bg-green-400"},
     {code: 'APPROVING', label: "Đang phê duyệt", color: "bg-emerald-500"},
     {code: 'WAITING_FOR_DISBURSEMENT', label: "Chờ giải ngân", color: "bg-yellow-500"},
-    { code: 'DISBURSED', label: 'Đã giải ngân', color: "bg-yellow-700" },
+    {code: 'DISBURSED', label: 'Đã giải ngân', color: "bg-yellow-700" },
     {code: 'REJECTED_CHECK_HS', label: "Đã từ chối", color: "bg-rose-400"},
 ];
 export const PERMISSIONS = [

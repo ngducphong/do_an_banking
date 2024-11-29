@@ -10,13 +10,14 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {
+    approvingLoanReqInfo,
     checkingCicLoanReqInfo,
-    checkingLoanReqInfo,
+    checkingLoanReqInfo, disbursedLoanReqInfo, evaluatingLoanReqInfo, finalEvaluationLoanReqInfo,
     getLoan,
-    receiveLoan, rejectedCheckHs,
+    receiveLoan, rejectedCheckHs, waitingForApprovalLoanReqInfo,
     waitingForCheckLoanReqInfo,
-    waitingForCicCheckLoanReqInfo,
-    waitingForEvaluationLoanReqInfo
+    waitingForCicCheckLoanReqInfo, waitingForDisbursementLoanReqInfo,
+    waitingForEvaluationLoanReqInfo, waitingForFinalEvaluationLoanReqInfo
 } from "../../../api/loanReqInfoAPIs.js";
 import moment from "moment";
 import {InfoCircleOutlined, LoadingOutlined} from "@ant-design/icons";
@@ -132,8 +133,28 @@ const ActionBrief = () => {
                         await getCicInformation(loan.getFieldValue('cccd'));
                         break;
                     case STATUSES[5].code:
-                    case STATUSES[6].code:
                         response = await waitingForEvaluationLoanReqInfo(loanId);
+                        break;
+                    case STATUSES[6].code:
+                        response = await evaluatingLoanReqInfo(loanId);
+                        break;
+                        case STATUSES[7].code:
+                        response = await waitingForFinalEvaluationLoanReqInfo(loanId);
+                        break;
+                        case STATUSES[8].code:
+                        response = await finalEvaluationLoanReqInfo(loanId);
+                        break;
+                        case STATUSES[9].code:
+                        response = await waitingForApprovalLoanReqInfo(loanId);
+                        break;
+                        case STATUSES[10].code:
+                        response = await approvingLoanReqInfo(loanId);
+                        break;
+                        case STATUSES[11].code:
+                        response = await waitingForDisbursementLoanReqInfo(loanId);
+                        break;
+                        case STATUSES[12].code:
+                        response = await disbursedLoanReqInfo(loanId);
                         break;
                     default:
                         openNotification("Không tìm thấy trạng thái phù hợp");
@@ -160,6 +181,7 @@ const ActionBrief = () => {
     }
     return (<>
         <Modal
+            onOk={handleOk}
             maskClosable={false}
             centered
             title={!cic ?
@@ -172,9 +194,9 @@ const ActionBrief = () => {
                 </div>
             }
             open={isModalOpen}
-            onCancel={handleCancel}
-            footer={null} // Không cần nút OK/Cancel
-
+            footer={[ <Button key="submit" type="primary" onClick={handleOk}>
+                OK
+            </Button>]}
         >
             {
                 !cic ? <p style={{textAlign: "center"}}>Điểm tín dụng đang được cập nhật!</p>
@@ -236,6 +258,11 @@ const ActionBrief = () => {
                             || (route.title === 'Chờ thẩm định ĐT' && trangthai === STATUSES[6].code)
                             || (route.title === 'Đang thẩm định ĐT' && trangthai === STATUSES[7].code)
                             || (route.title === 'Chờ thẩm định ĐB' && trangthai === STATUSES[8].code)
+                            || (route.title === 'Đang thẩm định ĐB' && trangthai === STATUSES[9].code)
+                            || (route.title === 'Chờ phê duyệt' && trangthai === STATUSES[10].code)
+                            || (route.title === 'Đang phê duyệt' && trangthai === STATUSES[11].code)
+                            || (route.title === 'Chờ giải ngân' && trangthai === STATUSES[12].code)
+                            || (route.title === 'Đã giải ngân' && trangthai === STATUSES[13].code)
                             || (route.title === 'Đã từ chối' && trangthai === 'REJECTED_CHECK')) ? 'text-red-500' : 'text-black'}>{route.title}</span>);
                 }}
                 items={trangthai !== 'REJECTED_CHECK' ? [{title: 'Chờ tiếp nhận HS',},
@@ -246,7 +273,14 @@ const ActionBrief = () => {
                         {title: 'Đang check CIC'},
                         {title: 'Chờ thẩm định ĐT'},
                         {title: 'Đang thẩm định ĐT'},
-                        {title: 'Chờ thẩm định ĐB'}].slice(currentIndex, currentIndex + 4) :
+                        {title: 'Chờ thẩm định ĐB'},
+                        {title: 'Đang thẩm định ĐB'},
+                        {title: 'Chờ phê duyệt'},
+                        {title: 'Đang phê duyệt'},
+                        {title: 'Chờ giải ngân'},
+                        {title: 'Đã giải ngân'},
+
+                    ].slice(currentIndex, currentIndex + 4) :
                     [{title: 'Đang KT'},
                         {title: 'Đã từ chối'},
                     ]} // Hiển thị 4 mục đầu tiên hoặc logic tùy chỉnh
@@ -290,7 +324,51 @@ const ActionBrief = () => {
                                             htmlType={'button'}>Từ chối</Button>
                                 </div> : trangthai === STATUSES[4].code ?
                                     <Button className={'mt-3 bg-[#CED0F8]'} htmlType={'submit'}>Check
-                                        CIC</Button> : ''}
+                                        CIC</Button> : trangthai === STATUSES[5].code ?
+                                        <div className={'flex'}>
+                                            <Button className={'mt-3 bg-[#CED0F8]'}
+                                                    htmlType={'submit'}>Check thành công</Button>
+                                            <Button onClick={() => {
+                                                setIsModalRefuseOpen(true)
+                                            }} className={'mt-3 bg-red-500 ml-5 '}
+                                                    htmlType={'button'}>Từ chối</Button>
+                                        </div> : trangthai === STATUSES[6].code ?
+                                                <Button className={'mt-3 bg-[#CED0F8]'}
+                                                        htmlType={'submit'}>Y/C thẩm định</Button>:
+                                            trangthai === STATUSES[7].code ?
+                                                <div className={'flex'}>
+                                                    <Button className={'mt-3 bg-[#CED0F8]'}
+                                                            htmlType={'submit'}>Thẩm định</Button>
+                                                    <Button onClick={() => {
+                                                        setIsModalRefuseOpen(true)
+                                                    }} className={'mt-3 bg-red-500 ml-5 '}
+                                                            htmlType={'button'}>Từ chối</Button>
+                                                </div>:trangthai === STATUSES[8].code ?
+                                                    <Button className={'mt-3 bg-[#CED0F8]'}
+                                                        htmlType={'submit'}>Y/C thẩm định</Button>:
+                                                    trangthai === STATUSES[9].code ?
+                                                        <div className={'flex'}>
+                                                            <Button className={'mt-3 bg-[#CED0F8]'}
+                                                                    htmlType={'submit'}>Thẩm định</Button>
+                                                            <Button onClick={() => {
+                                                                setIsModalRefuseOpen(true)
+                                                            }} className={'mt-3 bg-red-500 ml-5 '}
+                                                                    htmlType={'button'}>Từ chối</Button>
+                                                        </div>:trangthai === STATUSES[10].code ?
+                                                            <Button className={'mt-3 bg-[#CED0F8]'}
+                                                                htmlType={'submit'}>Y/C phê duyệt</Button>:
+                                                            trangthai === STATUSES[11].code ?
+                                                                <div className={'flex'}>
+                                                                    <Button className={'mt-3 bg-[#CED0F8]'}
+                                                                            htmlType={'submit'}>Phê duyệt</Button>
+                                                                    <Button onClick={() => {
+                                                                        setIsModalRefuseOpen(true)
+                                                                    }} className={'mt-3 bg-red-500 ml-5 '}
+                                                                            htmlType={'button'}>Từ chối</Button>
+                                                                </div>:trangthai === STATUSES[12].code ?
+                                                                    <Button className={'mt-3 bg-[#CED0F8]'}
+                                                                        htmlType={'submit'}>Đã giải ngân</Button>:
+                                            ''}
                     </div>
                     <Card className={'mt-4 mb-4'}>
                         <h3 className={'mb-4'}>THÔNG TIN KHÁCH HÀNG</h3>
@@ -299,7 +377,7 @@ const ActionBrief = () => {
                                 <Input readOnly/>
                             </Form.Item>
                             <Form.Item name={'cccd'} label={<><CreditCard/>CCCD</>}>
-                                <Input readOnly/>
+                            <Input readOnly/>
                             </Form.Item>
                             <Form.Item name={'hotenkhach'} label={<><PersonIcon/>Họ tên khách</>}>
                                 <Input readOnly/>
